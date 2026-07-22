@@ -1,6 +1,6 @@
 // Bumps the version, commits the release, and tags it. Run via `just release
 // [minor|patch]`. Pushing (git push && git push origin <tag>) is left to the
-// caller so the trigger for CI (a release commit landing on main) is explicit.
+// caller so the trigger for CI (a release tag landing on GitHub) is explicit.
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -45,7 +45,7 @@ const minor = Number(match[1]);
 const patch = Number(match[2]);
 const nextVersion =
   bump === "minor" ? `0.${minor + 1}.0` : `0.${minor}.${patch + 1}`;
-const tag = `v${nextVersion}`;
+const tag = nextVersion;
 
 if (git(["tag", "--list", tag])) {
   console.error(`Tag ${tag} already exists, aborting.`);
