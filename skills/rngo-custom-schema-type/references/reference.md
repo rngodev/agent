@@ -2,7 +2,7 @@
 
 Samples values previously emitted by an effect in the same simulation.
 
-## Keywords
+## Inputs
 
 ### `effect` — required
 

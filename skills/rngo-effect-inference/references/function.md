@@ -2,7 +2,7 @@
 
 Evaluates a [Common Expression Language (CEL)](https://github.com/google/cel-spec) expression and emits the result. The expression may reference named sub-schemas specified in the `variables` property.
 
-## Keywords
+## Inputs
 
 ### `expression` — required
 

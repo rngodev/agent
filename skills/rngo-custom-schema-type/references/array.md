@@ -2,7 +2,7 @@
 
 Generates an array of values from the specified `items` sub-schema.
 
-## Attributes
+## Inputs
 
 ### `items` — required
 
@@ -18,7 +18,7 @@ The maximum size of each generated array. Defaults to `minItems` plus 16.
 
 ## Examples
 
-Default size attributes:
+Default size bounds:
 
 ```json
 {
@@ -37,7 +37,7 @@ Default size attributes:
 }
 ```
 
-Custom size attributes:
+Custom size bounds:
 
 ```json
 {

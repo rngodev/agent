@@ -2,7 +2,7 @@
 
 Randomly generates an object based upon the provided `properties` keyword.
 
-## Keywords
+## Inputs
 
 ### `properties` — required
 

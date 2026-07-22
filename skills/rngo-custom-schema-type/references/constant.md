@@ -2,7 +2,7 @@
 
 Endlessly emits the specified literal value.
 
-## Keywords
+## Inputs
 
 ### `value` — required
 

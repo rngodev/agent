@@ -1,0 +1,2 @@
+build:
+    node scripts/build.mjs

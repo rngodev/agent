@@ -2,7 +2,7 @@
 
 Emits a value from exactly one of a set of sub-schemas, selected at random. By default, each sub-schema has an equal chance of being selected. However, weights can be assigned to each to adjust the probability of selection.
 
-## Keywords
+## Inputs
 
 ### `options` — required
 
