@@ -1,13 +1,19 @@
 // Bumps the version, commits the release, and tags it. Run via `just release
 // [minor|patch]`. Pushing (git push && git push origin <tag>) is left to the
 // caller so the trigger for CI (a release tag landing on GitHub) is explicit.
+// Also updates each skill's skills/*/.version to keep them in sync with the
+// root VERSION.
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const versionFile = path.join(root, "VERSION");
+const skillsDir = path.join(root, "skills");
+const skillVersionFiles = readdirSync(skillsDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => path.join(skillsDir, entry.name, ".version"));
 
 const bump = process.argv[2] ?? "minor";
 if (bump !== "minor" && bump !== "patch") {
@@ -54,6 +60,12 @@ if (git(["tag", "--list", tag])) {
 
 writeFileSync(versionFile, `${nextVersion}\n`);
 git(["add", versionFile]);
+
+for (const skillVersionFile of skillVersionFiles) {
+  writeFileSync(skillVersionFile, `${nextVersion}\n`);
+  git(["add", skillVersionFile]);
+}
+
 git(["commit", "-m", `Release ${tag}`]);
 git(["tag", "-a", tag, "-m", `Release ${tag}`]);
 
