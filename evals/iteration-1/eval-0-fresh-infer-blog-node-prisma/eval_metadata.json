@@ -1,0 +1,15 @@
+{
+  "eval_id": 0,
+  "eval_name": "fresh-infer-blog-node-prisma",
+  "prompt": "set up rngo for this project \u2014 infer channels and effects from the codebase.",
+  "assertions": [
+    "the .rngo directory (produced by rngo run --stdout with no parse error) contains a db channel and effects for user, post, and comment creation",
+    "no effect or channel file uses the old system:/format:{table:} field names instead of channel:/metadata:",
+    "the PostStatus enum is expressed via select of constant options, not an invented enum type",
+    "the isAdmin boolean is expressed via select between constant true and constant false",
+    "the nullable Post.body field is expressed via select between the real schema and a null constant",
+    "foreign keys (authorId, postId) are expressed via reference (optionally wrapped in function)",
+    "no string pattern contains ^ or $ regex anchors",
+    "rngo run --stdout against the produced .rngo directory exits without a parse/build error and emits events"
+  ]
+}

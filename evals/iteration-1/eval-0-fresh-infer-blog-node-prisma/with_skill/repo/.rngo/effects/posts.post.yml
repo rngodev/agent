@@ -1,0 +1,37 @@
+# Models POST /posts (src/index.ts). Only reads title, body, and authorId
+# from the request body — status is never client-settable, so it always
+# lands as the Prisma-default DRAFT. Runs in realtime, starting at "now".
+trigger: hz(2, hour)
+start: now
+channel: api
+schema:
+  type: object
+  properties:
+    method:
+      type: constant
+      value: POST
+    path:
+      type: constant
+      value: /posts
+    body:
+      type: object
+      properties:
+        title:
+          type: string
+          pattern: ".{10,100}"
+        body:
+          type: select
+          options:
+            - weight: 5
+              schema:
+                type: string
+                pattern: "(.|\n){50,2000}"
+            - weight: 1
+              schema: { type: constant, value: null }
+        authorId:
+          type: function
+          expression: author.id
+          variables:
+            author:
+              type: reference
+              effect: users.create

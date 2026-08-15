@@ -1,0 +1,20 @@
+trigger: hz(10, hour)
+channel: db
+metadata:
+  table: fulfillments
+schema:
+  type: object
+  properties:
+    id:
+      type: string
+      pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+    order_id:
+      type: function
+      expression: payment.order_id
+      variables:
+        payment:
+          type: reference
+          effect: payments.create
+    fulfilled_at:
+      type: context
+      path: ["clock", "now"]

@@ -1,0 +1,13 @@
+type: sql
+query: >
+  SELECT count(*)
+  FROM effects f
+  WHERE f.key = 'fulfillments.create'
+  AND NOT EXISTS (
+    SELECT 1
+    FROM effects p
+    WHERE p.key = 'payments.create'
+    AND p.value ->> '$.order_id' = f.value ->> '$.order_id'
+    AND p.offset <= f.offset
+  );
+expect: result == 0

@@ -1,0 +1,5 @@
+format:
+  type: sql
+target:
+  type: stream
+  command: sqlite3 db.sqlite

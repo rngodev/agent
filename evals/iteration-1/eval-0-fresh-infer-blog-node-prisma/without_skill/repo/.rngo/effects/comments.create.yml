@@ -1,0 +1,35 @@
+# Live traffic against POST /posts/:id/comments (src/index.ts). Targets
+# backdated posts (posts.create.history) since those are the only posts
+# whose real id is known to the simulation — posts created live via
+# posts.create.yml get a server-assigned id we never see (the handler
+# doesn't echo the created row back through anything the simulation reads
+# as an effect input).
+trigger: hz(30, day)
+start: now
+channel: api
+schema:
+  type: object
+  properties:
+    method:
+      type: constant
+      value: POST
+    path:
+      type: function
+      expression: "'/posts/' + post.id + '/comments'"
+      variables:
+        post:
+          type: reference
+          effect: posts.create.history
+    body:
+      type: object
+      properties:
+        body:
+          type: string
+          pattern: "[a-zA-Z0-9 .,!?'\"-]{5,500}"
+        authorId:
+          type: function
+          expression: author.id
+          variables:
+            author:
+              type: reference
+              effect: users.create

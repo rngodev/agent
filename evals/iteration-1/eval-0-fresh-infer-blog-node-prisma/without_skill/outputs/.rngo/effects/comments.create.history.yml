@@ -1,0 +1,35 @@
+# Backdated Comment rows, written directly to Postgres for the same reason
+# as posts.create.history.yml — need a known id/createdAt in the past. Only
+# attaches to backdated posts (posts.create.history) since those are the
+# only posts with ids known to the simulation ahead of time.
+trigger: hz(20, day)
+end: now
+channel: db
+metadata:
+  table: Comment
+schema:
+  type: object
+  properties:
+    id:
+      type: string
+      pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"
+    body:
+      type: string
+      pattern: "[a-zA-Z0-9 .,!?'\"-]{5,500}"
+    postId:
+      type: function
+      expression: post.id
+      variables:
+        post:
+          type: reference
+          effect: posts.create.history
+    authorId:
+      type: function
+      expression: author.id
+      variables:
+        author:
+          type: reference
+          effect: users.create
+    createdAt:
+      type: context
+      path: ["clock", "now"]

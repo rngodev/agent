@@ -1,0 +1,50 @@
+# Backfills the Post table directly. The public POST /posts endpoint always
+# creates a post with the Prisma-default DRAFT status (it never sets
+# `status`), so this is the only way PUBLISHED/ARCHIVED posts come to exist.
+# Runs only over the historical portion of the simulation (up to "now"),
+# since realtime post creation is instead modeled by the posts.post effect
+# via the api channel.
+trigger: hz(3, hour)
+end: now
+channel: db
+metadata:
+  table: Post
+schema:
+  type: object
+  properties:
+    id:
+      type: uuid
+    title:
+      type: string
+      pattern: ".{10,100}"
+    body:
+      type: select
+      options:
+        - weight: 5
+          schema:
+            type: string
+            pattern: "(.|\n){50,2000}"
+        - weight: 1
+          schema: { type: constant, value: null }
+    status:
+      type: select
+      options:
+        - weight: 6
+          schema: { type: constant, value: "PUBLISHED" }
+        - weight: 3
+          schema: { type: constant, value: "DRAFT" }
+        - weight: 1
+          schema: { type: constant, value: "ARCHIVED" }
+    authorId:
+      type: function
+      expression: author.id
+      variables:
+        author:
+          type: reference
+          effect: users.create
+    createdAt:
+      type: context
+      path: ["clock", "now"]
+    updatedAt:
+      type: context
+      path: ["clock", "now"]

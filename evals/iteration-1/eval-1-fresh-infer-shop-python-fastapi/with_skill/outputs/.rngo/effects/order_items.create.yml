@@ -1,0 +1,39 @@
+# app/models.py: OrderItem(id, order_id -> orders.id, product_id -> products.id, quantity, unit_price)
+# Each order typically has a few line items, so this fires a few times per order created.
+trigger: hz(35, hour)
+end: now
+channel: db
+metadata:
+  table: order_items
+schema:
+  type: object
+  properties:
+    id:
+      type: number
+      minimum: 1
+      scale: 0
+      step: 1
+    order_id:
+      type: function
+      expression: order.id
+      variables:
+        order:
+          type: reference
+          effect: orders.create
+    product_id:
+      type: function
+      expression: product.id
+      variables:
+        product:
+          type: reference
+          effect: products.create
+    quantity:
+      type: number
+      minimum: 1
+      maximum: 10
+      scale: 0
+    unit_price:
+      type: number
+      minimum: 1.00
+      maximum: 500.00
+      scale: 2

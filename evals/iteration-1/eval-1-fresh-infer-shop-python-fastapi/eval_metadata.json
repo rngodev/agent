@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "fresh-infer-shop-python-fastapi",
+  "prompt": "set up rngo for this project \u2014 infer channels and effects from the codebase.",
+  "assertions": [
+    "the .rngo directory (produced by rngo run --stdout with no parse error) contains a db channel and effects for product, order, and order_item creation",
+    "no effect or channel file uses the old system:/format:{table:} field names instead of channel:/metadata:",
+    "integer autoincrement primary keys use number with scale: 0 (and step: 1 where appropriate) rather than a string pattern",
+    "the OrderStatus enum is expressed via select of constant options",
+    "the in_stock boolean is expressed via select between constant true and constant false",
+    "the nullable tracking_number field is expressed via select between the real schema and a null constant",
+    "foreign keys (order_id, product_id) are expressed via reference (optionally wrapped in function)",
+    "rngo run --stdout against the produced .rngo directory exits without a parse/build error and emits events"
+  ]
+}
