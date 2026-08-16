@@ -16,6 +16,4 @@ Once installed, you can ask the agent to write rngo specs for you and write them
 
 | Skill  | Description |
 | ------------- | ------------- |
-| [rngo-system-inference](https://github.com/rngodev/agent/tree/main/skills/rngo-system-inference)  | Infer and create / update rngo systems |
-| [rngo-effect-inference](https://github.com/rngodev/agent/tree/main/skills/rngo-effect-inference)  | Infer and create / update rngo effects |
-| [rngo-custom-schema-type](https://github.com/rngodev/agent/tree/main/skills/rngo-custom-schema-type) | Create / update a custom schema type |
+| [rngo](https://github.com/rngodev/agent/tree/main/skills/rngo) | Write and update a project's rngo spec — infers channels and effects from the codebase, and authors invariants and custom schema types |
