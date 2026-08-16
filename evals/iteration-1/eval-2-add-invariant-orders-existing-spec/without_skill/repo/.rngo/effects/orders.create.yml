@@ -1,0 +1,30 @@
+trigger: hz(20, hour)
+channel: db
+metadata:
+  table: orders
+schema:
+  type: object
+  properties:
+    id:
+      type: string
+      pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+    customer_id:
+      type: function
+      expression: customer.id
+      variables:
+        customer:
+          type: reference
+          effect: customers.create
+    status:
+      type: select
+      options:
+        - schema: { type: constant, value: pending }
+        - schema: { type: constant, value: shipped }
+        - schema: { type: constant, value: cancelled }
+    total:
+      type: number
+      minimum: 5
+      maximum: 500
+    created_at:
+      type: context
+      path: ["clock", "now"]

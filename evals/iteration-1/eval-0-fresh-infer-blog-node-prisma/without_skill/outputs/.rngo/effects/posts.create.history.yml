@@ -1,0 +1,58 @@
+# Backdated Post rows, written directly to Postgres so they can carry
+# arbitrary createdAt timestamps and a known id (the real POST /posts
+# endpoint always defaults status to DRAFT and lets Prisma assign the id,
+# so it can't backfill a realistic mix of statuses/history — see
+# posts.create.yml for the live-traffic counterpart).
+trigger: hz(2, day)
+end: now
+channel: db
+metadata:
+  table: Post
+schema:
+  type: object
+  properties:
+    id:
+      type: string
+      pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"
+    title:
+      type: string
+      pattern: "[A-Z][a-zA-Z0-9 ,'-]{10,80}"
+    body:
+      type: select
+      options:
+        - weight: 9
+          schema:
+            type: string
+            pattern: "[a-zA-Z0-9 .,!?'\"-]{50,2000}"
+        - weight: 1
+          schema:
+            type: constant
+            value: null
+    status:
+      type: select
+      options:
+        - weight: 6
+          schema:
+            type: constant
+            value: PUBLISHED
+        - weight: 2
+          schema:
+            type: constant
+            value: DRAFT
+        - weight: 1
+          schema:
+            type: constant
+            value: ARCHIVED
+    authorId:
+      type: function
+      expression: author.id
+      variables:
+        author:
+          type: reference
+          effect: users.create
+    createdAt:
+      type: context
+      path: ["clock", "now"]
+    updatedAt:
+      type: context
+      path: ["clock", "now"]

@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "add-invariant-orders-existing-spec",
+  "prompt": "add an invariant that an order can never be fulfilled before it has been paid.",
+  "assertions": [
+    "a new file exists under .rngo/invariants/",
+    "the invariant has type: sql, a query field, and an expect field",
+    "the query references both the fulfillments and payments (or orders) effects, joined or filtered on order_id",
+    "the expect expression is a CEL comparison against result (e.g. result == 0)",
+    "the pre-existing spec.yml and effects/*.yml files are unchanged from the original fixture",
+    "rngo run --stdout against the produced .rngo directory exits without a parse/build error and emits events"
+  ]
+}

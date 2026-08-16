@@ -1,0 +1,7 @@
+target:
+  type: exec
+  command: >
+    curl -sS -X {{method}}
+    --header "Content-Type: application/json"
+    --data '{{body}}'
+    ${API_BASE_URL:-http://localhost:3000}{{path}}

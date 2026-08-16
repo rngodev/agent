@@ -1,0 +1,40 @@
+# Models POST /posts/:id/comments (src/index.ts). The post id comes from
+# the URL path, sampled from either the historical (posts.create) or
+# realtime (posts.post) post population, since both exist by "now" and
+# either could realistically receive a new comment. Runs in realtime,
+# starting at "now".
+trigger: hz(8, hour)
+start: now
+channel: api
+schema:
+  type: object
+  properties:
+    method:
+      type: constant
+      value: POST
+    path:
+      type: function
+      expression: "'/posts/' + post.id + '/comments'"
+      variables:
+        post:
+          type: select
+          options:
+            - schema:
+                type: reference
+                effect: posts.create
+            - schema:
+                type: reference
+                effect: posts.post
+    body:
+      type: object
+      properties:
+        body:
+          type: string
+          pattern: ".{5,500}"
+        authorId:
+          type: function
+          expression: author.id
+          variables:
+            author:
+              type: reference
+              effect: users.create

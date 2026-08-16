@@ -1,0 +1,40 @@
+# app/models.py: Product(id, sku, name, price, in_stock, created_at)
+# Catalog growth is slow relative to order traffic.
+trigger: hz(3, hour)
+end: now
+channel: db
+metadata:
+  table: products
+schema:
+  type: object
+  properties:
+    id:
+      type: number
+      minimum: 1
+      scale: 0
+      step: 1
+    sku:
+      type: string
+      pattern: "[A-Z]{3}-[0-9]{5}"
+    name:
+      type: string
+      pattern: "[A-Za-z0-9' ]{10,80}"
+    price:
+      type: number
+      minimum: 1.00
+      maximum: 500.00
+      scale: 2
+    in_stock:
+      type: select
+      options:
+        - weight: 4
+          schema:
+            type: constant
+            value: true
+        - weight: 1
+          schema:
+            type: constant
+            value: false
+    created_at:
+      type: context
+      path: ["clock", "now"]

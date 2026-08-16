@@ -1,0 +1,10 @@
+target:
+  type: exec
+  command: >
+    curl -sS -i \
+      -X {{method}} \
+      {{#eq method "POST"}}
+        --header "Content-Type: application/json" \
+        --data {{body}} \
+      {{/eq}}
+      ${API_BASE_URL:-http://localhost:3000}{{path}}

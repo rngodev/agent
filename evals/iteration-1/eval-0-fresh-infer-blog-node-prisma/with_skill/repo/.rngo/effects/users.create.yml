@@ -1,0 +1,42 @@
+# Backfills the User table directly. There is no public endpoint to create a
+# user (see src/index.ts), so this is the only way users ever enter the
+# system. Runs across the whole simulation window (not just historical),
+# since users can show up at any point in time.
+trigger: hz(1, hour)
+channel: db
+metadata:
+  table: User
+schema:
+  type: object
+  properties:
+    id:
+      type: uuid
+    email:
+      type: function
+      expression: "local + '@' + domain"
+      variables:
+        local:
+          type: string
+          pattern: "[a-z]{4,10}[.][a-z]{4,10}"
+        domain:
+          type: select
+          options:
+            - weight: 3
+              schema: { type: constant, value: "gmail.com" }
+            - weight: 2
+              schema: { type: constant, value: "outlook.com" }
+            - weight: 1
+              schema: { type: constant, value: "example.com" }
+    name:
+      type: string
+      pattern: "[A-Z][a-z]{2,9} [A-Z][a-z]{2,12}"
+    isAdmin:
+      type: select
+      options:
+        - weight: 9
+          schema: { type: constant, value: false }
+        - weight: 1
+          schema: { type: constant, value: true }
+    createdAt:
+      type: context
+      path: ["clock", "now"]

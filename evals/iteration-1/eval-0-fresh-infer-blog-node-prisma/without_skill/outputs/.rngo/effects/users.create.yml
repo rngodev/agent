@@ -1,0 +1,42 @@
+# Users have no creation API endpoint (see src/index.ts) — the only way to
+# seed them is by inserting directly into Postgres. Runs across the whole
+# simulation window since there's no "live" API path for user creation.
+trigger: hz(5, day)
+channel: db
+metadata:
+  table: User
+schema:
+  type: object
+  properties:
+    id:
+      type: string
+      pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"
+    email:
+      type: function
+      expression: "local + '-' + string(suffix) + '@example.com'"
+      variables:
+        local:
+          type: string
+          pattern: "[a-z]{4,10}"
+        suffix:
+          type: number
+          minimum: 10000
+          maximum: 999999
+          scale: 0
+    name:
+      type: string
+      pattern: "[A-Z][a-z]{2,10} [A-Z][a-z]{2,10}"
+    isAdmin:
+      type: select
+      options:
+        - weight: 19
+          schema:
+            type: constant
+            value: false
+        - weight: 1
+          schema:
+            type: constant
+            value: true
+    createdAt:
+      type: context
+      path: ["clock", "now"]

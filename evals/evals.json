@@ -1,0 +1,54 @@
+{
+  "skill_name": "rngo",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "fresh-infer-blog-node-prisma",
+      "prompt": "set up rngo for this project — infer channels and effects from the codebase.",
+      "expected_output": "A .rngo/ directory with spec.yml, a db channel (target.type stream, format.type sql, pointed at the local Postgres via psql/DATABASE_URL), and one effect per Prisma model (User, Post, Comment) with schemas that faithfully translate each field: uuid ids as unanchored string patterns, the PostStatus enum as select/constant, isAdmin as select/constant true|false, nullable body as select-with-null, authorId/postId as reference+function.",
+      "files": [],
+      "assertions": [
+        "the .rngo directory (produced by rngo run --stdout with no parse error) contains a db channel and effects for user, post, and comment creation",
+        "no effect or channel file uses the old system:/format:{table:} field names instead of channel:/metadata:",
+        "the PostStatus enum is expressed via select of constant options, not an invented enum type",
+        "the isAdmin boolean is expressed via select between constant true and constant false",
+        "the nullable Post.body field is expressed via select between the real schema and a null constant",
+        "foreign keys (authorId, postId) are expressed via reference (optionally wrapped in function)",
+        "no string pattern contains ^ or $ regex anchors",
+        "rngo run --stdout against the produced .rngo directory exits without a parse/build error and emits events"
+      ]
+    },
+    {
+      "id": 1,
+      "eval_name": "fresh-infer-shop-python-fastapi",
+      "prompt": "set up rngo for this project — infer channels and effects from the codebase.",
+      "expected_output": "A .rngo/ directory with spec.yml, a db channel for the local Postgres, and one effect per SQLAlchemy model (Product, Order, OrderItem) with schemas translating: integer autoincrement ids as number/scale:0/step:1, the OrderStatus enum as select/constant, in_stock boolean as select/constant true|false, nullable tracking_number as select-with-null, order_id/product_id as reference+function.",
+      "files": [],
+      "assertions": [
+        "the .rngo directory (produced by rngo run --stdout with no parse error) contains a db channel and effects for product, order, and order_item creation",
+        "no effect or channel file uses the old system:/format:{table:} field names instead of channel:/metadata:",
+        "integer autoincrement primary keys use number with scale: 0 (and step: 1 where appropriate) rather than a string pattern",
+        "the OrderStatus enum is expressed via select of constant options",
+        "the in_stock boolean is expressed via select between constant true and constant false",
+        "the nullable tracking_number field is expressed via select between the real schema and a null constant",
+        "foreign keys (order_id, product_id) are expressed via reference (optionally wrapped in function)",
+        "rngo run --stdout against the produced .rngo directory exits without a parse/build error and emits events"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "add-invariant-orders-existing-spec",
+      "prompt": "add an invariant that an order can never be fulfilled before it has been paid.",
+      "expected_output": "A new file under .rngo/invariants/ with type: sql, a query over the effects table (or effects+signals) that would catch a fulfillments.create effect whose order_id has no corresponding payments.create effect, and an expect: result == 0 (or equivalent) CEL expression. The pre-existing spec.yml/channels/effects are left intact.",
+      "files": [],
+      "assertions": [
+        "a new file exists under .rngo/invariants/",
+        "the invariant has type: sql, a query field, and an expect field",
+        "the query references both the fulfillments and payments (or orders) effects, joined or filtered on order_id",
+        "the expect expression is a CEL comparison against result (e.g. result == 0)",
+        "the pre-existing spec.yml and effects/*.yml files are unchanged from the original fixture",
+        "rngo run --stdout against the produced .rngo directory exits without a parse/build error and emits events"
+      ]
+    }
+  ]
+}

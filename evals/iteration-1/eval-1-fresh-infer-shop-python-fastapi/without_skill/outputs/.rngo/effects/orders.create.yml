@@ -1,0 +1,78 @@
+# app/models.py: Order(id, customer_email, status, total, tracking_number, created_at)
+# SQLAlchemy's Enum(OrderStatus) persists the member NAME by default (e.g. "PENDING"),
+# not the lowercase `.value` ("pending") -- so the DB rows use uppercase.
+trigger: hz(15, hour)
+end: now
+channel: db
+metadata:
+  table: orders
+schema:
+  type: object
+  properties:
+    id:
+      type: number
+      minimum: 1
+      scale: 0
+      step: 1
+    customer_email:
+      type: function
+      expression: "local + '@' + domain"
+      variables:
+        local:
+          type: string
+          pattern: "[a-z]{4,10}\\.[a-z]{3,10}"
+        domain:
+          type: select
+          options:
+            - weight: 3
+              schema:
+                type: constant
+                value: gmail.com
+            - weight: 2
+              schema:
+                type: constant
+                value: yahoo.com
+            - weight: 2
+              schema:
+                type: constant
+                value: outlook.com
+            - schema:
+                type: constant
+                value: icloud.com
+            - schema:
+                type: constant
+                value: protonmail.com
+    status:
+      type: select
+      options:
+        - weight: 5
+          schema:
+            type: constant
+            value: PENDING
+        - weight: 4
+          schema:
+            type: constant
+            value: SHIPPED
+        - weight: 1
+          schema:
+            type: constant
+            value: CANCELLED
+    total:
+      type: number
+      minimum: 1.99
+      maximum: 2999.99
+      scale: 2
+    tracking_number:
+      type: select
+      options:
+        - weight: 1
+          schema:
+            type: constant
+            value: null
+        - weight: 1
+          schema:
+            type: string
+            pattern: "[0-9A-Z]{12,30}"
+    created_at:
+      type: context
+      path: ["clock", "now"]

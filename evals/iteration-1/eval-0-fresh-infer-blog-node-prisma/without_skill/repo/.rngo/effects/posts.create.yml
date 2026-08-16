@@ -1,0 +1,40 @@
+# Live traffic against the real POST /posts endpoint (src/index.ts). The
+# handler only reads title/body/authorId off the request and lets Prisma
+# assign id/status(default DRAFT)/createdAt/updatedAt, so those aren't part
+# of the request schema.
+trigger: hz(3, day)
+start: now
+channel: api
+schema:
+  type: object
+  properties:
+    method:
+      type: constant
+      value: POST
+    path:
+      type: constant
+      value: /posts
+    body:
+      type: object
+      properties:
+        title:
+          type: string
+          pattern: "[A-Z][a-zA-Z0-9 ,'-]{10,80}"
+        body:
+          type: select
+          options:
+            - weight: 9
+              schema:
+                type: string
+                pattern: "[a-zA-Z0-9 .,!?'\"-]{50,2000}"
+            - weight: 1
+              schema:
+                type: constant
+                value: null
+        authorId:
+          type: function
+          expression: author.id
+          variables:
+            author:
+              type: reference
+              effect: users.create

@@ -1,0 +1,34 @@
+# Backfills the Comment table directly, giving historical posts (from
+# posts.create) a realistic comment history before "now". Realtime comment
+# creation is instead modeled by the comments.post effect via the api
+# channel.
+trigger: hz(10, hour)
+end: now
+channel: db
+metadata:
+  table: Comment
+schema:
+  type: object
+  properties:
+    id:
+      type: uuid
+    body:
+      type: string
+      pattern: ".{5,500}"
+    postId:
+      type: function
+      expression: post.id
+      variables:
+        post:
+          type: reference
+          effect: posts.create
+    authorId:
+      type: function
+      expression: author.id
+      variables:
+        author:
+          type: reference
+          effect: users.create
+    createdAt:
+      type: context
+      path: ["clock", "now"]
