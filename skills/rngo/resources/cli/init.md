@@ -11,7 +11,13 @@ seed: 1
 
 Then it ensures the `.gitignore` includes the `.rngo/runs` directory, which is where data from simulation runs will live.
 
-Finally it asks if and where it should install agent skills:
+You can pass `--default` to skip all prompts and take the defaults, e.g.:
+
+```
+rngo init --default
+```
+
+Otherwise, it asks if and where it should install agent skills:
 
 ```bash
 ✔ Would you like to install agent skills? · yes

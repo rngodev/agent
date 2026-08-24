@@ -99,3 +99,14 @@ rngo run --stdout
 ```
 
 This will skip channel routing and write all event values to stdout.
+
+## Validating a spec without running it
+
+You can set the `--dry-run` boolean flag, e.g.:
+
+```
+rngo run --dry-run
+```
+
+This builds the spec and reports a parse error if there is one, without running the simulation or routing
+anything to channels.
