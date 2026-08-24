@@ -16,7 +16,7 @@ Everything else in `resources/` is reference material to open as needed; don't r
 
 - `resources/guides/write-the-spec.md` — the general authoring methodology and file layout. Skim before
   writing your first channel or effect in a session.
-- `resources/concepts/{spec,channel,effect,schema,invariant,signal}.md` — go deeper on any one concept.
+- `resources/concepts/{spec,channel,effect,schema,signal}.md` — go deeper on any one concept.
 - `resources/schema/primitive/*.md` — every field of the 9 schema primitives (`array`, `constant`,
   `context`, `function`, `number`, `object`, `reference`, `select`, `string`). Open the relevant one
   whenever you're unsure what a field is called or does — don't guess.
@@ -124,7 +124,8 @@ something wrong with what you wrote.
 Write an invariant when the user describes a behavioral guarantee, or when it's clearly documented in the
 codebase (a comment, a `CLAUDE.md`, an obvious constraint like a unique index). Each invariant is a SQL
 query over the simulation's `effects`/`signals`/`errors` tables plus a CEL `expect` over `result` — see
-`resources/concepts/invariant.md` for the exact schema and worked examples. Don't invent invariants
+[/docs/concepts/invariant](https://rngo.dev/docs/concepts/invariant) for the exact schema and worked
+examples (not yet mirrored under `resources/`). Don't invent invariants
 nobody asked for and that aren't grounded in something real — a spec asserting the wrong things is worse
 than one asserting nothing, because it fails, or worse, silently passes, for reasons that don't matter.
 

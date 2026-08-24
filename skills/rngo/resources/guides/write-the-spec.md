@@ -5,20 +5,22 @@ if that descriptions holds for a running instance of that system.
 
 In particular, the spec describes behavior in terms of:
 
-1. a **simulation**, which applies [effects](/docs/concepts/effect) to the system via [channels](/docs/concepts/channel), all while gathering data
-2. an **audit**, which evaluates [invariants](/docs/concepts/invariant) against the gathered data
+- [effects](/docs/concepts/effect), which model individual inputs to the system
+- [signals](/docs/concepts/signal), which aggregate and classify inputs, outputs and metadata
+- [channels](/docs/concepts/channel), which model system interfaces
+- [schemas](/docs/concepts/schema), which allow for shared data among effects
 
-So, our goal is to write a spec for your system that results in a realistic simulation followed by a comprehensive audit.
+So, our goal is to write a spec for your system that has realistic effects and comprehensive signals.
 
 ## Layout
 
 You should commit a system's spec into its repository at `.rngo/spec.yml`.
 
-The entire spec could live in that file, but you can also break it out into files at the following locations:
+The entire spec could live in that file, but you can also break it out into sub-files at the following locations:
 
-- `.rngo/channels/*.yml`
 - `.rngo/effects/*.yml`
-- `.rngo/invariants/*.yml`
+- `.rngo/signals/*.yml`
+- `.rngo/channels/*.yml`
 - `.rngo/schemas/*.yml`
 
 A spec can get large, so this approach makes it easier to manage. The [CLI](/docs/cli) expects this layout, and [`rngo init`](/docs/cli/init) will
@@ -32,7 +34,7 @@ The base spec file at `.rngo/spec.yml` contains a few parameters that you may wa
 
 ## Channels
 
-You should define a [channel](/docs/concepts/channel) for any system interface that inputs [effects](/docs/concepts/effect) or outputs [signals](/docs/concepts/signal) (or both).
+You should define a [channel](/docs/concepts/channel) for any system interface that takes inputs or produces outputs (or both).
 
 For example, here's a channel for a Postgres DB that might live at `.rngo/channels/db.yml`:
 
@@ -106,12 +108,12 @@ Or from database schemas - add an effect to create a record for every table:
 
 For schemaless DBs, infer writes from the source code and write effects.
 
-## Invariants
+## Signals
 
-You should write an [invariant](/docs/concepts/invariant) for every behavorial pattern you expect to observe.
+You should write as [signal](/docs/concepts/signal) for every behavorial pattern you expect to observe.
 
-For example, this invariant states that any attempt to create a user with an age less than 18
-should result in an API error. It might live at `.rngo/invariants/minor-users-rejected.yml`:
+For example, this signal states that any attempt to create a user with an age less than 18
+should result in an API error. It might live at `.rngo/signals/minor-users-rejected.yml`:
 
 ```yaml
 type: sql
@@ -125,8 +127,8 @@ query: >
 expect: result == 0
 ```
 
-Ideally, you'll be able to derive invariants from product and architectural documentation,
-although in many cases the invariants themselves will be the source of truth.
+Ideally, you'll be able to derive signals from product and architectural documentation,
+although in many cases the signals themselves will be the source of truth.
 
 ## Schemas
 

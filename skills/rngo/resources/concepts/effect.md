@@ -1,6 +1,6 @@
 # Effect
 
-An **effect** models interactions with a system. For example, the following effect generates user creation events roughly once per hour:
+An **effect** generates inputs to a system. For example, the following effect generates user creation input roughly once per hour:
 
 ```yaml
 trigger: hz(1, hour)
@@ -21,15 +21,15 @@ schema:
 
 ## Schema
 
-An effect must specify a **schema**, which defines the structure and content of its events.
+An effect must specify a **schema**, which defines the structure and content of its inputs.
 
 See the [Schema reference](/docs/schema) for more details.
 
 ## Trigger
 
-An effect's **trigger** defines when it emits events. If not specified, an effect will emit roughly one event per day.
+An effect's **trigger** defines when it emits inputs. If not specified, an effect will emit roughly one input per day.
 
-The value is in Hertz but is also an expression, so you can use the more readable `hz` function instead of `0.0833`:
+The value is in Hertz but is also an expression, so you can use the more readable `hz` function instead of a raw number:
 
 ```
 hz(5, minute)

@@ -1,6 +1,6 @@
 # Channel
 
-**Channels** are proxies through which a simulation sends [effects](docs/concepts/effect) to and receives [signals](docs/concepts/signal)
+**Channels** are proxies through which a simulation sends inputs and receives outputs
 from the system-under-test. For example:
 
 ```yaml
@@ -21,6 +21,37 @@ channels:
       command: tail -F logs/app.log
 ```
 
+## Output
+
+A channel _may_ produce outputs, which could be either:
+
+- **interactive**, or explicitly caused by one input, e.g. a response to an HTTP request
+- **ambient**, or having ambiguous causality, e.g. an application log line
+
+In either case, every output is added to the simulation log and may be included in a [signal](/docs/concepts/signal).
+
+Interactive outputs always include an `input_id` foreign key to the input that caused it. Currently, this will only come from systems with `exec`-type targets.
+
+Ambient outputs come from systems with `stream`-type targets. They may come from channels that take inputs, e.g.:
+
+```yaml
+format:
+  type: sql
+target:
+  type: stream
+  command: psql -q $DATABASE_URL
+```
+
+Or from channels that do not expect inputs (and therefore do not need a format) e.g.:
+
+```yaml
+target:
+  type: stream
+  command: tail -F logs/app.log
+```
+
+Both channels will produce ambient outputs - i.e. without an input FK - because they are asynchronous, so causality is generally ambiguous.
+
 ## Private Channels
 
 All simulations will include channels that proxy to public interfaces - e.g., APIs, web apps, CLIs. But most will also include channels
@@ -38,8 +69,7 @@ order to [reference](/docs/schema/primitive/reference) it in other effects.
 
 ### Observability
 
-Simulations often incorporate logs, metrics, traces, etc. as _read-only channels_ so that their signals can be the subject
-of [invariants](docs/concepts/invariant).
+Simulations often incorporate logs, metrics, traces, etc. as _read-only channels_ so that their outputs can be [signals](docs/concepts/signal).
 
 ## Target
 
