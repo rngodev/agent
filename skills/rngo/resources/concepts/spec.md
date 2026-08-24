@@ -7,12 +7,6 @@ key: my-service
 seed: 41
 start: now - years(5)
 end: now + minutes(3)
-channels:
-  sqlite:
-    format:
-      type: sql
-    target:
-      command: sqlite3 db.sqlite
 effects:
   user.create:
     channel: sqlite
@@ -26,6 +20,19 @@ effects:
         name:
           type: string
           pattern: .{0,36}
+signals:
+  no-errors:
+    type: sql
+    query: >
+      select count(*) from signals
+      where level = 'error';
+    expect: result == 0
+channels:
+  sqlite:
+    format:
+      type: sql
+    target:
+      command: sqlite3 db.sqlite
 schemas:
   myId:
     schema:
@@ -33,13 +40,6 @@ schemas:
       minimum: 1
       scale: 0
       step: 1
-invariants:
-  no-errors:
-    type: sql
-    query: >
-      select count(*) from signals
-      where level = 'error';
-    expect: result == 0
 ```
 
 ## Key
@@ -81,23 +81,23 @@ Each may resolve to any time past or future, as long as `start` is earlier than 
 
 By default `start` is `now - days(30)` and `end` is `now`.
 
-## Channels
-
-`channels` is a map of named [channels](/docs/concepts/channel), or system interfaces. Any channel referenced by an effect must be included in this map.
-
-See [Channel](/docs/concepts/channel) for syntax details.
-
 ## Effects
 
 `effects` is a map of named [effects](/docs/concepts/effect), or system interactions. It must contain at least one entry, but usually contains many.
 
 See [Effect](/docs/concepts/effect) for syntax details.
 
-## Invariants
+## Signals
 
-`invariants` is a map of named [invariants](/docs/concepts/invariant) that must hold in order for an audit to pass.
+`signals` is a map of named [signals](/docs/concepts/signal) that define signficant patterns and expectations in the simulation data.
 
-See [Invariant](/docs/concepts/invariant) for syntax details.
+See [Signal](/docs/concepts/signal) for syntax details.
+
+## Channels
+
+`channels` is a map of named [channels](/docs/concepts/channel), or system interfaces. Any channel referenced by an effect must be included in this map.
+
+See [Channel](/docs/concepts/channel) for syntax details.
 
 ## Schemas
 

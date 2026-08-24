@@ -1,11 +1,11 @@
 # Welcome!
 
-rngo helps you learn what your code does by simulating usage and recording everything.
+rngo helps you learn what your code does by simulating usage, recording everything and auditing the results.
 
-In particular, rngo implements
+In particular, rngo gives you
 
 - a specification language that describes a system's behavior
-- a CLI that verifies whether a specification holds for an instance of its system
+- a CLI that verifies whether a specification holds for an instance of the system
 
 The rngo specification language is declarative and intuitive - both you and your agent
 will find it easy to write. Here's an example spec:
@@ -85,8 +85,8 @@ effects:
             title:
               type: string
               format: .{0,100}
-invariants:
-  api-enforces-minimum-title-length:
+signals:
+  api-minimum-title-length:
     type: sql
     query: >
       SELECT count(*) 
@@ -114,7 +114,8 @@ db: 73104 effects, 0 signals
 api: 11 effects, 11 signals
 
 Audit
-1/1 invariants passed
+api-minimum-title-length: 0 (passed)
+1 passed
 ```
 
 ---

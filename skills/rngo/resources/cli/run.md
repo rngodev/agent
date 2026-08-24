@@ -52,7 +52,7 @@ If the path already exists in `.rngo/config.yml`, the `.rngo/effects` file will 
 
 ## Applying Effects
 
-`rngo run` will run the spec and routes the stream of events to the appropriate [channels](/docs/concepts/channel).
+`rngo run` will run the spec and routes the stream of inputs to the appropriate [channels](/docs/concepts/channel).
 
 Consider the following excerpt from a spec:
 
@@ -99,3 +99,7 @@ rngo run --stdout
 ```
 
 This will skip channel routing and write all event values to stdout.
+
+## --dry-run
+
+If `--dry-run` is specified, the spec will be parsed and nothing else. If it fails to parse a code of 1 will be returned.
