@@ -2,7 +2,7 @@
 
 Emits a value from the simulation's dynamic context.
 
-## Inputs
+## Parameters
 
 ### `path` — required
 

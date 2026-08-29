@@ -5,7 +5,7 @@ Runs a [spec](/docs/concepts/spec). By default, it:
 1. builds the spec based upon the `.rngo` directory
 2. runs the spec locally
 3. routes the effects to the appropriate [channels](/docs/concepts/channel)
-4. stores all [effects](/docs/concepts/effect) and [signals](/docs/concepts/signal) in the local run directory
+4. records all data in the local run directory
 
 ## Building a Spec
 
@@ -50,7 +50,7 @@ effects:
 
 If the path already exists in `.rngo/config.yml`, the `.rngo/effects` file will be ignored. An analogous process happens for the files in the `.rngo/systems` and `.rngo/schemas` directories.
 
-## Applying Effects
+## Applying Inputs
 
 `rngo run` will run the spec and routes the stream of inputs to the appropriate [channels](/docs/concepts/channel).
 
@@ -71,26 +71,30 @@ effects:
       # ...
 ```
 
-In this case, all events for the `invoice.create` effect will be piped into the `sqlite3 db1.sqlite` command.
+In this case, all inputs from the `invoice.create` effect will be piped to the `sqlite3 db1.sqlite` command.
 
-You can specify a raw output for an effect, like this:
+## Capturing Outputs
 
-```yaml
-effects:
-  orders.create:
-    schema:
-      type: object
-      # ...
+Each run gets its own directory, e.g. at:
+
+```bash
+.rngo/runs/01a005e6-1e8f-72b2-abfc-2da7a7a8dbdf/
 ```
 
-`rngo run` will route to a default channel — in this case, it is effectively something like:
+This will contain:
 
-```yaml
-format:
-  type: json
-import:
-  command: cat > .rngo/runs/019f3fd6-8d2e-7101-9b68-b4b63cb2bb19/orders.jsonl
+- `spec.yml`, which has the full resolved spec used by the run
+- `log.sqlite`, which is a SQLite database containing every input, output and metadata
+
+The last run will be symlinked at
+
+```bash
+.rngo/runs/last
 ```
+
+## Flags
+
+### --stdout
 
 You can set the `--stdout` boolean flag, e.g.:
 
@@ -100,6 +104,6 @@ rngo run --stdout
 
 This will skip channel routing and write all event values to stdout.
 
-## --dry-run
+### --dry-run
 
 If `--dry-run` is specified, the spec will be parsed and nothing else. If it fails to parse a code of 1 will be returned.

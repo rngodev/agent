@@ -51,19 +51,17 @@ warnings: 16
 1 failed
 ```
 
-If any signal expectation fails, the CLI process will return an exit code of 1. Additionally, the CLI will write the results as json to `.rngo/runs/last/signals.json`, e.g.:
+If any signal expectation fails, the CLI process will return an exit code of 1. Additionally, the CLI will write the results to the `signals` table in the run's `log.sqlite`:
 
-```json
-{
-  "no-500s": {
-    "value": 3,
-    "passed": false
-  },
-  "no-error-logs": {
-    "value": 0,
-    "passed": true
-  }
-}
+```
+sqlite> select * from signals;
++-------------+-------+--------+-------+
+|     key     | value | result | error |
++-------------+-------+--------+-------+
+| no-errors   | 3096  | failed |       |
+| some-inputs | 1556  | passed |       |
+| warnings    | 16    |        |       |
++-------------+-------+--------+-------+
 ```
 
 ## Examples

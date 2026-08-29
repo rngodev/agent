@@ -1,6 +1,6 @@
 # Effect
 
-An **effect** generates inputs to a system. For example, the following effect generates user creation input roughly once per hour:
+An **effect** generates inputs to a [channel](/docs/channel). For example, the following effect generates user creation input roughly once per hour:
 
 ```yaml
 trigger: hz(1, hour)
@@ -61,10 +61,12 @@ channels:
 effects:
   users.create:
     channel: mydb
+    metadata:
+      table: USERS
     schema: ...
 ```
 
-If a `channel` is not explicitly configured, the events will be written to the file system.
+If an effect does not specify a channel, the data will still be captured in the run log.
 
 ## Metadata
 

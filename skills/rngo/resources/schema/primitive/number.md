@@ -2,7 +2,7 @@
 
 Randomly generates decimal or integer values.
 
-## Inputs
+## Parameters
 
 ### `minimum` — optional
 

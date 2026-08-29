@@ -2,7 +2,7 @@
 
 Generates an array of values from the specified `items` sub-schema.
 
-## Inputs
+## Parameters
 
 ### `items` — required
 
