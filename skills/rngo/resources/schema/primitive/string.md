@@ -2,7 +2,7 @@
 
 Randomly generates a string value.
 
-## Inputs
+## Parameters
 
 ### `pattern` — optional
 

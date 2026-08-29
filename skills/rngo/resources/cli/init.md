@@ -30,6 +30,8 @@ infer rngo systems and effects!
 
 If you are not using a coding agent, see the [channel](/docs/concepts/channel) and [effect](/docs/concepts/effect) references for details on how to define them manually.
 
-## `--default`
+## Flags
+
+### --default
 
 The `--default` flag will ask for the default key and seed, and choose not to install the skill.

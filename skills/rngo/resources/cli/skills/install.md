@@ -13,10 +13,14 @@ By default, this command will ask where to install the skills:
   Other
 ```
 
+If the skills at the selected directory are out-of-date, the CLI will remove them and replace them with latest release from [https://github.com/rngodev/agent](https://github.com/rngodev/agent).
+
+## Flags
+
+### --path
+
 You can directly specify the location using the `--path` flag:
 
 ```bash
 rngo skills intall --path ~/.myagent/skills
 ```
-
-Either way, if the skills at the specified directory are out-of-date, the CLI will remove them and replace them with latest release from [https://github.com/rngodev/agent](https://github.com/rngodev/agent).

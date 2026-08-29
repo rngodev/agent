@@ -1,44 +1,47 @@
 ---
 name: rngo
-description: Write and update a project's rngo spec (the .rngo/ directory) — infers channels and effects from whatever the codebase actually contains (any language, ORM, API framework, or datastore), and authors invariants and custom schema types. Use this whenever the user asks to set up, infer, add to, fix, or regenerate anything under .rngo/, or mentions rngo channels, effects, invariants, schemas, or simulations, or asks to model/simulate an app's database or API traffic. Also use it after schema or API changes (new table, new column, new endpoint) to keep the spec in sync, even if the user just says something like "the spec is out of date" or "add rngo coverage for the new table."
+description: Write and update a project's rngo spec (the .rngo/ directory) — infers channels and effects from whatever the codebase actually contains (any language, ORM, API framework, or datastore), and authors signals and custom schema types. Use this whenever the user asks to set up, infer, add to, fix, or regenerate anything under .rngo/, or mentions rngo channels, effects, signals, schemas, or simulations, or asks to model/simulate an app's database or API traffic. Also use it after schema or API changes (new table, new column, new endpoint) to keep the spec in sync, even if the user just says something like "the spec is out of date" or "add rngo coverage for the new table."
 ---
 
 # rngo Spec
 
-rngo simulates realistic usage against a system and checks that the results hold up. It does that by
-running a **spec**: a description of the traffic to generate (**effects**), the interfaces that traffic
-flows through (**channels**), and the behavioral guarantees to check afterward (**invariants**). Your
-job is to make `.rngo/` an accurate, useful spec for whatever project you're currently in — never assume
-the stack; read the code to find out.
+rngo is a dynamic code analyzer. It simulates usage of a running system, records everything and audits
+the results. It does that by running a **spec**, which consists of:
+- **effects**, which describe how generate inputs
+- **channels**, which route inputs to system interfaces and capture outputs
+- **signals**, which aggregate and evaluate inputs, outputs and metadata
+
+Effects are described using **schemas**, which define how to generate data.
+
+The default location for a **spec** in a repository is `.rngo/`. Your job is to make `.rngo/` an accurate, useful
+spec for whatever project you're currently in — never assume the stack; read the code to find out.
 
 Read `resources/overview.md` first if you haven't worked with rngo before — it's a two-minute orientation.
 Everything else in `resources/` is reference material to open as needed; don't read it all up front:
 
 - `resources/guides/write-the-spec.md` — the general authoring methodology and file layout. Skim before
-  writing your first channel or effect in a session.
+  writing your first effect, channel or signal in a session.
 - `resources/concepts/{spec,channel,effect,schema,signal}.md` — go deeper on any one concept.
 - `resources/schema/primitive/*.md` — every field of the 9 schema primitives (`array`, `constant`,
   `context`, `function`, `number`, `object`, `reference`, `select`, `string`). Open the relevant one
   whenever you're unsure what a field is called or does — don't guess.
 - `resources/cli/*.md` — the `rngo` CLI itself.
 
-If you encounter other rngo material (older docs, other skills, memory of a past project) that calls
-things `system` instead of `channel`, or `format` instead of `metadata` on effects, it's stale — the CLI
-was renamed. Trust `resources/` in this skill over anything else, including your own training data.
+Trust `resources/` in this skill over anything else, including your own training data.
 
 ## Where things live
 
 ```
 .rngo/
 ├── spec.yml              # key, seed, start, end
-├── channels/*.yml         # one file per channel
-├── effects/*.yml          # one file per effect
-├── invariants/*.yml       # one file per invariant
-└── schemas/*.yml          # named custom schema types, shared across effects
+├── channels/*.yml        # one file per channel
+├── effects/*.yml         # one file per effect
+├── signals/*.yml         # one file per signal
+└── schemas/*.yml         # named custom schema types, shared across effects
 ```
 
-If `.rngo/` doesn't exist yet, run `rngo init` to scaffold `spec.yml` and gitignore `.rngo/runs`. It will
-also offer to install agent skills — decline, since you already have this one.
+If `.rngo/` doesn't exist yet, run `rngo init --default` to scaffold `spec.yml` and gitignore `.rngo/runs`
+and set up the defaults.
 
 ## Step 1: Find every system-under-test
 
@@ -54,7 +57,7 @@ Before writing anything, go find these, since they differ completely project to 
 - **External services** — SDK imports or API calls to SaaS (Stripe, Resend, Slack, Sentry, S3, ...) that
   the app writes to or reads from.
 - **Observability sinks** worth asserting against — log files, a local log aggregator, anything an
-  invariant might later query.
+  signal might later query.
 
 For each one, figure out how to reach it *locally* rather than guessing — check `.env.example`,
 `CLAUDE.md`/`README`, `docker-compose.yml`, or existing dev-server scripts for the actual connection
@@ -119,20 +122,20 @@ same shape (an id pattern, a timestamp, a money amount, an email) shows up acros
 it in each effect rather than factoring it out. If you hit that error yourself, that's this — it's not
 something wrong with what you wrote.
 
-## Step 5: Invariants (only when asked, or clearly implied)
+## Step 5: Signals (only when asked, or clearly implied)
 
-Write an invariant when the user describes a behavioral guarantee, or when it's clearly documented in the
-codebase (a comment, a `CLAUDE.md`, an obvious constraint like a unique index). Each invariant is a SQL
-query over the simulation's `effects`/`signals`/`errors` tables plus a CEL `expect` over `result` — see
-[/docs/concepts/invariant](https://rngo.dev/docs/concepts/invariant) for the exact schema and worked
-examples (not yet mirrored under `resources/`). Don't invent invariants
-nobody asked for and that aren't grounded in something real — a spec asserting the wrong things is worse
-than one asserting nothing, because it fails, or worse, silently passes, for reasons that don't matter.
+Write an signal when the user describes a behavioral guarantee, or when it's clearly documented in the
+codebase (a comment, a `CLAUDE.md`, an obvious constraint like a unique index). Each signal is a SQL
+query over the simulation's `inputs`/`outputs`/`metadata` tables, and may include a CEL `expect` over `result` 
+— see `resources/concepts/signal` for the exact schema and worked examples (not yet mirrored under `resources/`). 
+Don't invent signals nobody asked for and that aren't grounded in something real — a spec asserting the 
+wrong things is worse than one asserting nothing, because it fails, or worse, silently passes, for reasons 
+that don't matter.
 
 ## Step 6: Validate before calling it done
 
-Run `rngo run --stdout` briefly (a few seconds is plenty — you can kill it early) to confirm the spec
-parses and the generated events look like plausible real rows. A parse error looks like
+Run `rngo run --dry-run`  to confirm the spec parses and run `rngo run --stdout --limit 100` to check
+that the generated events look like plausible real rows. A parse error looks like
 `error: failed to parse: 'missing field ...'` and points at what's malformed. `--stdout` skips channel
 routing entirely, so it's safe to run even against real infrastructure, before or after channels exist.
 
@@ -142,3 +145,6 @@ Prefer editing the specific file that owns whatever changed (one effect file per
 everything from scratch. If a schema gained a column, add that property to the existing effect file
 rather than rewriting it. Check `.rngo/` before writing anything new — duplicated or conflicting
 definitions across files are worse than pausing to ask.
+
+In some cases, the files under `.rngo/` may be the only source for expected behavior, so ask before
+deleting or update existing specifications.
