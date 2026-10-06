@@ -96,14 +96,16 @@ The last run will be symlinked at
 
 ### --stdout
 
-You can set the `--stdout` boolean flag, e.g.:
-
-```
-rngo run --stdout
-```
-
-This will skip channel routing and write all event values to stdout.
+Skip channel routing and write all inputs to stdout.
 
 ### --dry-run
 
-If `--dry-run` is specified, the spec will be parsed and nothing else. If it fails to parse a code of 1 will be returned.
+Parse the spec and do nothing else. If it fails to parse a code of 1 will be returned.
+
+### --realtime
+
+Send each input to the system under test as close as possible to the input's timestamp.
+
+The default behavior is to send inputs immediately. This flag will have no impact on backdated inputs, since their timestamps have already elapsed.
+
+Existing with ctrl-c may result in logging a pending event that was never sent to the system.
