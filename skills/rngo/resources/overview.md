@@ -23,15 +23,13 @@ channels:
       type: stream
       command: sqlite3 db.sqlite
   api:
-    target: exec
-    command: >
-      curl -sS \
-        -X {{method}} \
-        {{#eq method "POST"}}
-          --header "Content-Type: application/json" \
-          --data {{body}} \
-        {{/eq}}
-        $API_BASE_URL{{path}}
+    format:
+      type: template
+      template: >-
+        curl -sS -X {{data.method}} "${API_BASE_URL:-http://localhost:5173}{{{data.path}}}"
+        {{#if data.body}}-H 'Content-Type: application/json' --data '{{json data.body}}'{{/if}}
+    target:
+      type: exec
 effects:
   users.create:
     trigger: hz(100, day)
