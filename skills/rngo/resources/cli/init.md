@@ -9,7 +9,7 @@ key: my-project
 seed: 1
 ```
 
-Then it ensures the `.gitignore` includes the `.rngo/runs` directory, which is where data from simulation runs will live.
+Then it ensures the `.gitignore` includes the `.rngo/evals` directory, which is where data from evals will live.
 
 Finally it asks if and where it should install agent skills:
 
@@ -28,7 +28,7 @@ A coding agent is the easiest way to infer systems and effects. With the above s
 infer rngo systems and effects!
 ```
 
-If you are not using a coding agent, see the [channel](/docs/concepts/channel) and [effect](/docs/concepts/effect) references for details on how to define them manually.
+If you are not using a coding agent, see the [channel](/docs/spec/channel) and [effect](/docs/spec/effect) references for details on how to define them manually.
 
 ## Flags
 

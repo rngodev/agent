@@ -1,6 +1,6 @@
 # reference
 
-Samples values from the run log for the specified [effect](/docs/concepts/effect).
+Samples values from the run log for the specified [effect](/docs/spec/effect).
 
 ## Parameters
 
@@ -17,21 +17,17 @@ How successive values are emitted - could be either of:
 
 ## Examples
 
-Random sample:
+### Random Sample
 
-```json
-{
-  "type": "reference",
-  "effect": "users.create"
-}
+```yaml
+type: reference
+effect: "users.create"
 ```
 
-Random _unique_ sample:
+### Unique Sample
 
-```json
-{
-  "type": "reference",
-  "effect": "account.post",
-  "cursor": "unique"
-}
+```yaml
+type: reference
+effect: "account.post"
+cursor: unique
 ```

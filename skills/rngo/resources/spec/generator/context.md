@@ -10,20 +10,20 @@ The path to the desired value.
 
 ## Examples
 
+### Current Logical Time
+
 Get the current in-simulation ISO 8601 date and time:
 
-```json
-{
-  "type": "context",
-  "path": ["clock", "now"]
-}
+```yaml
+type: context
+path: [clock, now]
 ```
+
+### Trigger Event
 
 Get the event that triggered the current effect:
 
-```json
-{
-  "type": "context",
-  "path": ["trigger", "event"]
-}
+```yaml
+type: context
+path: [trigger, event]
 ```
