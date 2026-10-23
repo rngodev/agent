@@ -21,17 +21,11 @@ generator:
 
 ## Parameters
 
-### `generator` — required
-
-Defines the structure and content of its inputs.
-
-See the [Generator reference](/docs/spec) for more details.
-
 ### `trigger` — optional
 
 An effect's **trigger** defines when it emits inputs. If not specified, an effect will emit roughly one input per day.
 
-The value is in Hertz but is also an expression, so you can use the more readable `hz` function instead of a raw number:
+The value is in Hertz but is also an [expression](/docs/reference/expressions), so you can use the more readable `hz` function instead of a raw number:
 
 ```
 hz(5, minute)
@@ -48,6 +42,22 @@ hz(3, hour) + (0.0001 * offset)
 The expression is sampled periodically over the course of the simulation, so the observed frequency will change in steps.
 
 Trigger frequency will always be adjusted to be greater than or equal to zero and less than 1000 Hz.
+
+### `start` — optional
+
+When the effect starts.
+
+Must be between the _simulation's_ `start` and `end`, and must come before this effect's `end`. Defaults to the simulation's `start`.
+
+May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
+
+### `end` — optional
+
+When the effect ends.
+
+Must be between the _simulation's_ `start` and `end`, and must come after this effect's `start`. Defaults to the simulation's `end`.
+
+May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
 
 ### `channel` — required
 
@@ -85,6 +95,12 @@ effects:
 
 In this case, the effect's metadata is meaningful to it's "mysql" channel. Assuming the channel uses the
 "sql" format, it will use the `table` metadata field as the table name when formatting SQL statements.
+
+### `generator` — required
+
+Defines the structure and content of its inputs.
+
+See the [generator reference](/docs/spec/generator) for more details.
 
 ## Examples
 
