@@ -1,31 +1,33 @@
 ---
 name: rngo
-description: Write and update a project's rngo spec (the .rngo/ directory) — infers channels and effects from whatever the codebase actually contains (any language, ORM, API framework, or datastore), and authors signals and custom schema types. Use this whenever the user asks to set up, infer, add to, fix, or regenerate anything under .rngo/, or mentions rngo channels, effects, signals, schemas, or simulations, or asks to model/simulate an app's database or API traffic. Also use it after schema or API changes (new table, new column, new endpoint) to keep the spec in sync, even if the user just says something like "the spec is out of date" or "add rngo coverage for the new table."
+description: Write and update a project's rngo spec (the .rngo/ directory) — infers channels and effects from whatever the codebase actually contains (any language, ORM, API framework, or datastore), and authors signals and custom generator types. Use this whenever the user asks to set up, infer, add to, fix, or regenerate anything under .rngo/, or mentions rngo channels, effects, signals, generators, or simulations, or asks to model/simulate an app's database or API traffic. Also use it after schema or API changes (new table, new column, new endpoint) to keep the spec in sync, even if the user just says something like "the spec is out of date" or "add rngo coverage for the new table."
 ---
 
 # rngo Spec
 
 rngo is a dynamic code analyzer. It simulates usage of a running system, records everything and audits
-the results. It does that by running a **spec**, which consists of:
-- **effects**, which describe how generate inputs
+the results. It does that by evaluating a **spec**, which consists of:
+- **effects**, which describe how to generate inputs
 - **channels**, which route inputs to system interfaces and capture outputs
 - **signals**, which aggregate and evaluate inputs, outputs and metadata
 
-Effects are described using **schemas**, which define how to generate data.
+Effect inputs are described using **generators**, which define how to generate data.
 
-The default location for a **spec** in a repository is `.rngo/`. Your job is to make `.rngo/` an accurate, useful
-spec for whatever project you're currently in — never assume the stack; read the code to find out.
+The default location for a **spec** in a repository is `.rngo/`. Your job is to make `.rngo/` an accurate, exhaustive account of expected behavior
+for whatever project you're currently in — never assume the stack; read the code to find out.
 
 Read `resources/overview.md` first if you haven't worked with rngo before — it's a two-minute orientation.
 Everything else in `resources/` is reference material to open as needed; don't read it all up front:
 
 - `resources/guides/write-the-spec.md` — the general authoring methodology and file layout. Skim before
   writing your first effect, channel or signal in a session.
-- `resources/concepts/{spec,channel,effect,schema,signal}.md` — go deeper on any one concept.
-- `resources/schema/primitive/*.md` — every field of the 9 schema primitives (`array`, `constant`,
+- `resources/concepts.md` — the platform's core concepts (simulation, audit).
+- `resources/spec/{overview,channel,effect,signal,generator,format}.md` — go deeper on any one part of the spec.
+- `resources/spec/generator/*.md` — every field of the 9 generator primitives (`array`, `constant`,
   `context`, `function`, `number`, `object`, `reference`, `select`, `string`). Open the relevant one
   whenever you're unsure what a field is called or does — don't guess.
-- `resources/cli/*.md` — the `rngo` CLI itself.
+- `resources/cli/*.md` — the `rngo` CLI `itself.
+- `resources/reference/*.md` — the run log and expression syntax.
 
 Trust `resources/` in this skill over anything else, including your own training data.
 
@@ -37,7 +39,7 @@ Trust `resources/` in this skill over anything else, including your own training
 ├── channels/*.yml        # one file per channel
 ├── effects/*.yml         # one file per effect
 ├── signals/*.yml         # one file per signal
-└── schemas/*.yml         # named custom schema types, shared across effects
+└── generators/*.yml      # named custom generator types, shared across effects
 ```
 
 If `.rngo/` doesn't exist yet, run `rngo init --default` to scaffold `spec.yml` and gitignore `.rngo/runs`
@@ -72,7 +74,7 @@ One channel per interface found above, at `.rngo/channels/{name}.yml`. Two decis
 - **`format.type`** — `sql` if the target accepts SQL insert statements (most relational DBs); `json`
   (or omit — `json` is the default no-op) for anything else, including document stores and APIs.
 
-Read `resources/concepts/channel.md` for the full field reference and worked examples (Postgres, cURL,
+Read `resources/spec/channel.md` for the full field reference and worked examples (Postgres, cURL,
 log tailing) before writing one from scratch.
 
 ## Step 3: Define effects
@@ -92,7 +94,7 @@ are only 9 schema primitives, so everything else is composed:
 | nullable / optional field | `select` between the real schema and `{type: constant, value: null}` |
 | foreign key / relation | `reference` to the referenced effect, usually wrapped in `function` to pull a specific field (e.g. `.id`) |
 | timestamp defaulting to "now" | `context` with `path: ["clock", "now"]` |
-| composed value (email, full name, money) | `function` combining `select`/`constant`/`string`/`number` variables — see `resources/concepts/schema.md`'s email example |
+| composed value (email, full name, money) | `function` combining `select`/`constant`/`string`/`number` variables — see `resources/spec/generator/function.md`'s email example |
 
 `string` patterns match against the whole value already — never add `^`/`$` anchors. The CLI rejects them
 (`invalid pattern: anchor is not supported`) even though you may see anchored examples elsewhere. Write
@@ -107,14 +109,14 @@ method-call form (`n.toString()`). The method form doesn't error, it just silent
 zero events, which is easy to miss unless you're watching event counts during validation.
 
 Set `trigger` to reflect realistic *relative* volume across effects (some tables churn far faster than
-others) — see `resources/concepts/effect.md#trigger` for the `hz()` helper and the growth-over-time
+others) — see `resources/spec/effect.md#trigger` for the `hz()` helper and the growth-over-time
 pattern via `offset`. Effects that reference other effects need those to make sense as a dependency (file
 order in `.rngo/effects/` doesn't matter, but a `posts.create` referencing `users.create` should exist
 sensibly relative to it).
 
 ## Step 4: Factor out repeated shapes
 
-`resources/concepts/schema.md#custom-schema-types` describes defining a shape once under
+`resources/spec/generator.md#custom-types` describes defining a shape once under
 `.rngo/schemas/{name}.yml` (or inline under a top-level `schemas:` key) and referencing it by name to
 avoid repeating it across effects. As of the currently installed CLI, referencing a custom type this way
 fails with `no schema parser matched` — confirmed directly, not just in docs. Until that's fixed, when the
@@ -127,14 +129,14 @@ something wrong with what you wrote.
 Write an signal when the user describes a behavioral guarantee, or when it's clearly documented in the
 codebase (a comment, a `CLAUDE.md`, an obvious constraint like a unique index). Each signal is a SQL
 query over the simulation's `inputs`/`outputs`/`metadata` tables, and may include a CEL `expect` over `result` 
-— see `resources/concepts/signal` for the exact schema and worked examples (not yet mirrored under `resources/`). 
+— see `resources/spec/signal.md` (and `resources/spec/signal/sql.md`) for the exact schema and worked examples. 
 Don't invent signals nobody asked for and that aren't grounded in something real — a spec asserting the 
 wrong things is worse than one asserting nothing, because it fails, or worse, silently passes, for reasons 
 that don't matter.
 
 ## Step 6: Validate before calling it done
 
-Run `rngo run --dry-run`  to confirm the spec parses and run `rngo run --stdout --limit 100` to check
+Run `rngo eval --dry-run`  to confirm the spec parses and run `rngo eval --stdout --limit 100` to check
 that the generated events look like plausible real rows. A parse error looks like
 `error: failed to parse: 'missing field ...'` and points at what's malformed. `--stdout` skips channel
 routing entirely, so it's safe to run even against real infrastructure, before or after channels exist.

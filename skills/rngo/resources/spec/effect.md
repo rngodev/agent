@@ -7,7 +7,7 @@ trigger: hz(1, hour)
 channel: db
 metadata:
   table: USERS
-schema:
+generator:
   type: object
   properties:
     name:
@@ -19,17 +19,13 @@ schema:
       scale: 0
 ```
 
-## Schema
+## Parameters
 
-An effect must specify a **schema**, which defines the structure and content of its inputs.
-
-See the [Schema reference](/docs/schema) for more details.
-
-## Trigger
+### `trigger` — optional
 
 An effect's **trigger** defines when it emits inputs. If not specified, an effect will emit roughly one input per day.
 
-The value is in Hertz but is also an expression, so you can use the more readable `hz` function instead of a raw number:
+The value is in Hertz but is also an [expression](/docs/reference/expressions), so you can use the more readable `hz` function instead of a raw number:
 
 ```
 hz(5, minute)
@@ -47,28 +43,44 @@ The expression is sampled periodically over the course of the simulation, so the
 
 Trigger frequency will always be adjusted to be greater than or equal to zero and less than 1000 Hz.
 
-## Channel
+### `start` — optional
+
+When the effect starts.
+
+Must be between the _simulation's_ `start` and `end`, and must come before this effect's `end`. Defaults to the simulation's `start`.
+
+May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
+
+### `end` — optional
+
+When the effect ends.
+
+Must be between the _simulation's_ `start` and `end`, and must come after this effect's `start`. Defaults to the simulation's `end`.
+
+May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
+
+### `channel` — required
 
 All effects are bound to a **channel**:
 
 ```yaml
 channels:
   mydb:
+    type: stream
+    command: sqlite3 db.sqlite
     format:
       type: sql
-    target:
-      command: sqlite3 db.sqlite
 effects:
   users.create:
     channel: mydb
     metadata:
       table: USERS
-    schema: ...
+    generator: ...
 ```
 
 If an effect does not specify a channel, the data will still be captured in the run log.
 
-## Metadata
+### `metadata` — optional
 
 An effect may specify **metadata**, which is an arbitrary map:
 
@@ -78,11 +90,17 @@ effects:
     channel: mysql
     metadata:
       table: Article
-    schema: ...
+    generator: ...
 ```
 
 In this case, the effect's metadata is meaningful to it's "mysql" channel. Assuming the channel uses the
 "sql" format, it will use the `table` metadata field as the table name when formatting SQL statements.
+
+### `generator` — required
+
+Defines the structure and content of its inputs.
+
+See the [generator reference](/docs/spec/generator) for more details.
 
 ## Examples
 
@@ -97,7 +115,7 @@ end: now
 channel: db
 metadata:
   table: USERS
-schema:
+generator:
   type: object
   properties:
     id:
@@ -126,7 +144,7 @@ trigger: "hz(15, minute)"
 start: now
 end: now + minutes(3)
 channel: api
-schema:
+generator:
   type: object
   properties:
     method:

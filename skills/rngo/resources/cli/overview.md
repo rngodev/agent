@@ -42,7 +42,7 @@ end: now + hours(12)
 | `start` | optional | The starting point in time for the simulation. Accepts expressions like `now - weeks(8)`. |
 | `end`   | optional | The ending point in time for the simulation. Accepts expressions like `now + days(1)`.    |
 
-Systems and effects each get their own configuration files under `.rngo/systems/`, `.rngo/effects/` and `.rngo/schemas/`, e.g.:
+Systems and effects each get their own configuration files under `.rngo/systems/`, `.rngo/effects/` and `.rngo/generators/`, e.g.:
 
 ```
 > ls -l .rngo
@@ -51,7 +51,7 @@ Systems and effects each get their own configuration files under `.rngo/systems/
 .rngo/effects/user.create.yml
 .rngo/effects/post.create.yml
 .rngo/effects/comment.create.yml
-.rngo/schemas/email.yml
+.rngo/generators/email.yml
 ```
 
-See the [channel](/docs/concepts/channel), [effect](/docs/concepts/effect), and [schema](/docs/concepts/schema) references to see how to customize.
+See the [channel](/docs/spec/channel), [effect](/docs/spec/effect), and [generator](/docs/spec/generator) references to see how to customize.

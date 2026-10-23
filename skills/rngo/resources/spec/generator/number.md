@@ -22,42 +22,36 @@ The size of the step between successive emitted values. If positive, the first v
 
 ## Examples
 
-Unbounded:
+### Unbounded
 
-```json
-{
-  "type": "number"
-}
+```yaml
+type: number
 ```
 
-Bounded:
+### Bounded
 
-```json
-{
-  "type": "number",
-  "minimum": -3.14,
-  "maximum": 2.71
-}
+```yaml
+type: number
+minimum: -3.14
+maximum: 2.71
 ```
 
-Integer:
+### Integer
 
-```json
-{
-  "type": "number",
-  "minimum": 0,
-  "maximum": 10000,
-  "scale": 0
-}
+```yaml
+type: number
+minimum: 0
+maximum: 10000
+scale: 0
 ```
 
-Incrementing ID:
+### Incrementing ID
 
-```json
-{
-  "type": "number",
-  "minimum": 1,
-  "scale": 0,
-  "step": 1
-}
+All natural numbers in order, starting with `1`.
+
+```yaml
+type: number
+minimum: 1
+scale: 0
+step: 1
 ```

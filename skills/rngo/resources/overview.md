@@ -4,8 +4,8 @@ rngo helps you learn what your code does by simulating usage, recording everythi
 
 In particular, rngo gives you
 
-- a specification language that describes a system's behavior
-- a CLI that verifies whether a specification holds for an instance of the system
+- a [specification language](/docs/spec) that describes a system's behavior
+- a [CLI](/docs/cli) that verifies whether a specification holds for an instance of the system
 
 The rngo specification language is declarative and intuitive - both you and your agent
 will find it easy to write. Here's an example spec:
@@ -17,19 +17,17 @@ start: now - years(2)
 end: now + minutes(5)
 channels:
   db:
+    type: stream
+    command: sqlite3 db.sqlite
     format:
       type: sql
-    target:
-      type: stream
-      command: sqlite3 db.sqlite
   api:
     format:
       type: template
       template: >-
         curl -sS -X {{data.method}} "${API_BASE_URL:-http://localhost:5173}{{{data.path}}}"
         {{#if data.body}}-H 'Content-Type: application/json' --data '{{json data.body}}'{{/if}}
-    target:
-      type: exec
+    type: exec
 effects:
   users.create:
     trigger: hz(100, day)
@@ -37,7 +35,7 @@ effects:
     channel: db
     metadata:
       table: USERS
-    schema:
+    generator:
       type: object
       properties:
         id:
@@ -61,7 +59,7 @@ effects:
     trigger: hz(120, hour)
     start: now
     channel: api
-    schema:
+    generator:
       type: object
       properties:
         path:
@@ -96,11 +94,11 @@ signals:
     expect: result == 0
 ```
 
-You can use the [rngo run](/docs/cli/run) CLI command to verify that the spec holds for a running instance of `my-blog`, e.g.:
+You can use the [rngo eval](/docs/cli/eval) CLI command to verify that the spec holds for a running instance of `my-blog`, e.g.:
 
 ```bash
 export API_BASE_URL=https://localhost:5000
-rngo run --spec spec.yml
+rngo eval --spec spec.yml
 ```
 
 This will produce output similar to:
