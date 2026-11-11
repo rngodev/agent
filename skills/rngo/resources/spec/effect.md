@@ -21,6 +21,16 @@ generator:
 
 ## Parameters
 
+### `prototype` — optional
+
+A [prototype](/docs/spec/prototype) provides default values for the following parameters:
+
+- `start`
+- `end`
+- `channel`
+
+If not specified, the [default prototype](/docs/spec/prototype#default) will be used.
+
 ### `trigger` — optional
 
 An effect's **trigger** defines when it emits inputs. If not specified, an effect will emit roughly one input per day.
@@ -45,21 +55,17 @@ Trigger frequency will always be adjusted to be greater than or equal to zero an
 
 ### `start` — optional
 
-When the effect starts.
-
-Must be between the _simulation's_ `start` and `end`, and must come before this effect's `end`. Defaults to the simulation's `start`.
+When the effect starts. Defaults to the [prototype's](/docs/spec/prototype) `start`.
 
 May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
 
 ### `end` — optional
 
-When the effect ends.
-
-Must be between the _simulation's_ `start` and `end`, and must come after this effect's `start`. Defaults to the simulation's `end`.
+When the effect ends. Defaults to the [prototype's](/docs/spec/prototype) `end`.
 
 May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
 
-### `channel` — required
+### `channel` — optional
 
 All effects are bound to a **channel**:
 
@@ -78,7 +84,9 @@ effects:
     generator: ...
 ```
 
-If an effect does not specify a channel, the data will still be captured in the run log.
+Defaults to the [prototype's](/docs/spec/prototype) `channel`.
+
+If a channel cannot be resolved, the effect's inputs will not be sent to the [proxy](/docs/concepts#proxy), but they will still be captured in the [log](/docs/concepts#log).
 
 ### `metadata` — optional
 

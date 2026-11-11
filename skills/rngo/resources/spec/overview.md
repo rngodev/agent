@@ -78,9 +78,15 @@ Must be a positive integer, and defaults to `1`.
 
 Changing `seed` lets you get a fresh set of data for an otherwise identical simulation.
 
+### `prototypes` — optional
+
+Shared attributes among effects.
+
+Must be an object of named prototypes. See the [prototype reference](/docs/spec/prototype) for how to define one.
+
 ### `start` — optional
 
-When the simulation starts.
+The default effect start time.
 
 May be any time past or future, but must come before `end`. Defaults to `now - days(30)`.
 
@@ -88,7 +94,7 @@ May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
 
 ### `end` — optional
 
-When the simulation ends.
+The default effect end time.
 
 May be any time past or future, but must come after `start`. Defaults to `now`.
 

@@ -22,7 +22,7 @@ Everything else in `resources/` is reference material to open as needed; don't r
 - `resources/guides/write-the-spec.md` — the general authoring methodology and file layout. Skim before
   writing your first effect, channel or signal in a session.
 - `resources/concepts.md` — the platform's core concepts (simulation, audit).
-- `resources/spec/{overview,channel,effect,signal,generator,format}.md` — go deeper on any one part of the spec.
+- `resources/spec/{overview,channel,effect,prototype,signal,generator,format}.md` — go deeper on any one part of the spec.
 - `resources/spec/generator/*.md` — every field of the 9 generator primitives (`array`, `constant`,
   `context`, `function`, `number`, `object`, `reference`, `select`, `string`). Open the relevant one
   whenever you're unsure what a field is called or does — don't guess.
@@ -113,6 +113,12 @@ others) — see `resources/spec/effect.md#trigger` for the `hz()` helper and the
 pattern via `offset`. Effects that reference other effects need those to make sense as a dependency (file
 order in `.rngo/effects/` doesn't matter, but a `posts.create` referencing `users.create` should exist
 sensibly relative to it).
+
+When several effects share the same `channel`, `start` or `end`, define a **prototype** under the top-level
+`prototypes:` key and reference it from each effect with `prototype:` instead of repeating those fields.
+Prototypes can also declare `scenarios` (named overrides, e.g. a shorter backfill window) that are selected
+with `rngo eval --scenario <name>`. See `resources/spec/prototype.md`. Effects with no `prototype` use the
+spec's top-level `start`/`end` as the default prototype.
 
 ## Step 4: Factor out repeated shapes
 

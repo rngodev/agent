@@ -94,10 +94,6 @@ The last eval will be symlinked at
 
 ## Flags
 
-### --stdout
-
-Skip channel routing and write all inputs to stdout.
-
 ### --dry-run
 
 Parse the spec and do nothing else. If it fails to parse a code of 1 will be returned.
@@ -109,3 +105,11 @@ Send each input to the system under test as close as possible to the input's tim
 The default behavior is to send inputs immediately. This flag will have no impact on backdated inputs, since their timestamps have already elapsed.
 
 Existing with ctrl-c may result in logging a pending event that was never sent to the system.
+
+### --scenario
+
+Run the eval for particular [prototype scenario](/docs/spec/prototype). Depending on the spec, this may change parameters for multiple effects, most commonly `start` and `end`.
+
+### --stdout
+
+Skip channel routing and write all inputs to stdout.
