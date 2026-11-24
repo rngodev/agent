@@ -2,7 +2,7 @@ trigger: hz(15, hour)
 channel: db
 metadata:
   table: payments
-schema:
+generator:
   type: object
   properties:
     id:

@@ -4,7 +4,7 @@ Runs each input as a command in a sub-shell. It expects a string, and will recor
 
 Since the commands run in the shell, they can make use of features like quoting, expansions and pipes. Additionally the CLI will load the local `.env`, which means these commands can reference those environment variables.
 
-The stdout of each command's sub-shell is recorded as an interactive [output](/docs/spec/channel#output), i.e. it includes the ID of the input that triggered it.
+The stdout and stderr of each command's sub-shell is recorded as an interactive [output](/docs/spec/channel#output), i.e. it includes the ID of the input that triggered it.
 
 ## Parameters
 
@@ -25,4 +25,4 @@ format:
   template: curl -sS -X {{data.method}} ${API_BASE_URL:-http://localhost:5173}{{data.path}}
 ```
 
-This uses a [`template`](/docs/spec/format/template) format that expects the effect data to include `method` and `path` fields. The `API_URL` can be picked up either from the environment, or a local `.env`.
+This uses a [`template`](/docs/spec/format/template) format that expects the effect data to include `method` and `path` fields. The `API_BASE_URL` can be picked up either from the environment, or a local `.env`.

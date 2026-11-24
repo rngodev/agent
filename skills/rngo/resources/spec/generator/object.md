@@ -17,6 +17,7 @@ type: object
 properties:
   name:
     type: string
+    pattern: "[A-Za-z ]{5,20}"
   age:
     type: number
 ```

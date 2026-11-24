@@ -4,7 +4,7 @@ Evaluates a [spec](/docs/spec). By default, it:
 
 1. builds the spec based upon the `.rngo` directory
 2. runs the simulation locally
-3. routes the effects to the appropriate [channels](/docs/spec/channel)
+3. routes the inputs to the appropriate [channels](/docs/spec/channel)
 4. records all data in the local eval directory
 
 ## Building a Spec
@@ -48,7 +48,14 @@ effects:
           pattern: .{2,64}
 ```
 
-If the path already exists in `.rngo/config.yml`, the `.rngo/effects` file will be ignored. An analogous process happens for the files in the `.rngo/systems` and `.rngo/generators` directories.
+If the key already exists in `.rngo/spec.yml`, the `.rngo/effects` file replaces it. The same process applies to the `.rngo/channels`, `.rngo/generators` and `.rngo/signals` directories.
+
+To use another location, pass it as an argument: either a directory, or a single file that holds the whole spec:
+
+```bash
+rngo eval path/to/project
+rngo eval spec.yml
+```
 
 ## Applying Inputs
 
@@ -83,7 +90,8 @@ Each eval gets its own directory, e.g. at:
 
 This will contain:
 
-- `spec.yml`, which has the full resolved spec used by the eval
+- `spec.json`, which has the full resolved spec
+- `spec.rewritten.json`, which has the spec that actually ran, if `--scenario` or `--stdout` changed it
 - `log.sqlite`, which is a SQLite database containing every input, output and metadata
 
 The last eval will be symlinked at
@@ -96,7 +104,11 @@ The last eval will be symlinked at
 
 ### --dry-run
 
-Parse the spec and do nothing else. If it fails to parse a code of 1 will be returned.
+Check that the simulation can be built, and do nothing else. If it fails, a code of 1 will be returned.
+
+### --limit
+
+Cap the number of inputs the eval produces.
 
 ### --realtime
 
@@ -104,7 +116,7 @@ Send each input to the system under test as close as possible to the input's tim
 
 The default behavior is to send inputs immediately. This flag will have no impact on backdated inputs, since their timestamps have already elapsed.
 
-Existing with ctrl-c may result in logging a pending event that was never sent to the system.
+An input is only logged once it is due. Stopping with ctrl-c ends the wait, audits what ran, and exits with code 1; a second ctrl-c exits immediately.
 
 ### --scenario
 
@@ -112,4 +124,4 @@ Run the eval for particular [prototype scenario](/docs/spec/prototype). Dependin
 
 ### --stdout
 
-Skip channel routing and write all inputs to stdout.
+Write inputs to stdout instead of sending them to their channels. Each channel's format still applies, and inputs from effects without a channel are not printed.

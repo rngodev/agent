@@ -2,7 +2,7 @@
 // Deterministic (no-LLM) checks for a produced `.rngo/` directory.
 //
 // These are the assertions from evals.json that can be verified with grep-ish
-// heuristics instead of judgment: does the spec parse and emit events, are
+// heuristics instead of judgment: does the spec parse, are
 // field names not using the pre-migration schema, are there no stray regex
 // anchors, and (per eval) do known fields show the expected shape.
 //
@@ -124,20 +124,20 @@ function sha256(p) {
   return createHash("sha256").update(readFileSync(p)).digest("hex");
 }
 
-function checkInvariantEval(dir, fixtureDir) {
+function checkSignalEval(dir, fixtureDir) {
   const failures = [];
-  const invDir = path.join(dir, ".rngo", "invariants");
-  const invFiles = existsSync(invDir)
-    ? readdirSync(invDir)
+  const signalDir = path.join(dir, ".rngo", "signals");
+  const signalFiles = existsSync(signalDir)
+    ? readdirSync(signalDir)
         .filter((f) => f.endsWith(".yml"))
         .sort()
-        .map((f) => path.join(invDir, f))
+        .map((f) => path.join(signalDir, f))
     : [];
-  if (invFiles.length === 0) {
-    return ["no file found under .rngo/invariants/"];
+  if (signalFiles.length === 0) {
+    return ["no file found under .rngo/signals/"];
   }
 
-  for (const f of invFiles) {
+  for (const f of signalFiles) {
     const text = readFileSync(f, "utf8");
     for (const field of ["type: sql", "query:", "expect:"]) {
       if (!text.includes(field)) failures.push(`${f}: missing \`${field}\``);
@@ -195,9 +195,9 @@ function main() {
   const results = [];
 
   const [parseOk, parseDetail] = runParseCheck(dir);
-  results.push(["rngo run --stdout parses with no error and emits events", parseOk, parseDetail]);
+  results.push(["rngo eval --dry-run parses with no error", parseOk, parseDetail]);
 
-  const files = readAll(dir, [".rngo/effects", ".rngo/channels", ".rngo/invariants", ".rngo/schemas"]);
+  const files = readAll(dir, [".rngo/effects", ".rngo/channels", ".rngo/signals", ".rngo/generators"]);
   const effectsFiles = readAll(dir, [".rngo/effects"]);
 
   const oldFields = checkNoOldFieldNames(effectsFiles);
@@ -213,9 +213,9 @@ function main() {
     }
   }
 
-  if (evalName === "add-invariant-orders-existing-spec") {
-    const failures = checkInvariantEval(dir, fixture);
-    results.push(["invariant added correctly; pre-existing files unchanged", failures.length === 0, failures.join("; ")]);
+  if (evalName === "add-signal-orders-existing-spec") {
+    const failures = checkSignalEval(dir, fixture);
+    results.push(["signal added correctly; pre-existing files unchanged", failures.length === 0, failures.join("; ")]);
   }
 
   let failed = 0;

@@ -21,6 +21,18 @@ if (bump !== "minor" && bump !== "patch") {
   process.exit(1);
 }
 
+// The CLI silently skips a release whose requirement it can't parse, so catch
+// a missing or malformed one here. Accepts comma-separated comparators.
+const requirementFile = path.join(root, "cli-requirement.txt");
+const requirement = existsSync(requirementFile)
+  ? readFileSync(requirementFile, "utf8").trim()
+  : "";
+const comparator = /^(?:=|>=|>|<=|<|~|\^)?\s*(?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*)){0,2}$/;
+if (!requirement.split(",").every((part) => comparator.test(part.trim()))) {
+  console.error(`cli-requirement.txt "${requirement}" isn't a semver requirement like ">=0.41.0", aborting.`);
+  process.exit(1);
+}
+
 function git(args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
 }

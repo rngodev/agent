@@ -44,7 +44,7 @@ If an effect does not explicitly reference a named prototype, it uses the **defa
 
 The key of the channel to which member effects will send inputs, by default.
 
-An effect may override its prototype's channel. If channel is not specified at the prototype level, each effect _must_ specify a channel.
+An effect may override its prototype's channel. If neither specifies a channel, the inputs are logged but not sent anywhere.
 
 ### `start` — optional
 
@@ -62,9 +62,15 @@ May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601)
 
 An effect may override its prototype's end.
 
+### `limit` — optional
+
+The maximum number of inputs each member effect emits, by default. Must be a positive integer.
+
+An effect may override its prototype's limit.
+
 ### `scenarios` — optional
 
-An object of named prototype overrides, which will be applied when the CLI eval is run with the corresponding `--scenario` flag.
+An object of named overrides of `start` and `end`, which will be applied when the CLI eval is run with the corresponding `--scenario` flag.
 
 A single scenario key may be used across multiple prototypes:
 

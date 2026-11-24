@@ -4,17 +4,11 @@ Randomly generates a string value.
 
 ## Parameters
 
-### `pattern` — optional
+### `pattern` — required
 
-The regular expression that generated strings must match. Defaults to `.{0,64}`.
+The regular expression that generated strings must match. It always matches the whole value, so anchors (`^` and `$`) are not supported.
 
 ## Examples
-
-### Default Length
-
-```yaml
-type: string
-```
 
 ### Custom Length
 
@@ -27,5 +21,5 @@ pattern: ".{5,10}"
 
 ```yaml
 type: string
-pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 ```
