@@ -14,7 +14,7 @@ The **subject** of a spec is the system it is describing. It could have arbitrar
 
 ## Eval
 
-An **eval** detetermines if a spec holds for a given deployment of its subject.
+An **eval** determines if a spec holds for a given deployment of its subject.
 
 You can run an eval using the `rngo eval` CLI command.
 
@@ -22,7 +22,7 @@ You can run an eval using the `rngo eval` CLI command.
 
 The **log** stores all inputs, outputs, signals and metadata during an eval.
 
-It is the centralized states as the proxy, simualtion and audit may each write to and / or read from it.
+It is the centralized state, as the proxy, simulation and audit may each write to and / or read from it.
 
 See the [log reference](/docs/reference/log) for more details.
 
@@ -42,6 +42,6 @@ In the spec, the simulation is defined via the [`effects`](/docs/spec/effect) pa
 
 ## Audit
 
-An **audit** surfaces notables **signals** from the inputs, outputs and metadata of the log.
+An **audit** surfaces notable **signals** from the inputs, outputs and metadata of the log.
 
-In the spec, the simulation is defined via the [`signals`](/docs/spec/signal) parameter.
+In the spec, the audit is defined via the [`signals`](/docs/spec/signal) parameter.

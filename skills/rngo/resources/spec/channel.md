@@ -13,7 +13,7 @@ channels:
     type: exec
     format:
       type: template
-      template: curl -sS -X {{method}} $API_BASE_URL{{path}}
+      template: curl -sS -X {{data.method}} $API_BASE_URL{{{data.path}}}
   log:
     type: stream
     command: tail -F logs/app.log
@@ -34,7 +34,7 @@ Ambient outputs come from `stream` channels. They may come from channels that ta
 
 ## Primitive Types
 
-A channel is represented as a [discriminated union](docs/spec#discriminated-unions) of primitive types:
+A channel is represented as a [discriminated union](/docs/spec#discriminated-unions) of primitive types:
 
 - [exec](/docs/spec/channel/exec) - runs each input as a command in a one-off sub-shell
 - [stream](/docs/spec/channel/stream) - sends each input to the stdin of a command in a sub-shell
@@ -43,4 +43,4 @@ A channel is represented as a [discriminated union](docs/spec#discriminated-unio
 
 Defines how it will transform an input prior to sending it to the system. If no format is specified, the input's JSON-encoded data will be sent.
 
-There are two supported type:
+See the [format reference](/docs/spec/format) for the supported types.

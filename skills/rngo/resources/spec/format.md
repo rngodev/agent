@@ -15,7 +15,7 @@ If a channel does not specify a format, the input's JSON-encoded data is sent as
 
 ## Primitive Types
 
-A format is represented as a [discriminated union](docs/spec#discriminated-unions) of primitive types:
+A format is represented as a [discriminated union](/docs/spec#discriminated-unions) of primitive types:
 
 - [template](/docs/spec/format/template) - builds a string using a Handlebars template
 - [sql](/docs/spec/format/sql) - formats the input as SQL insert

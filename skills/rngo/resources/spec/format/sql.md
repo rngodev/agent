@@ -25,5 +25,5 @@ Given an input from the `users` effect with the following data:
 Produces the following SQL insert:
 
 ```sql
-INSERT INTO `users` (id, name, admin) VALUES (1, 'Alice', true);
+INSERT INTO users ("admin", "id", "name") VALUES (true, 1, 'Alice');
 ```

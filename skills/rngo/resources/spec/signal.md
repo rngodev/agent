@@ -7,13 +7,13 @@ It may be paired with an expectation. For example, here's one that expects no er
 ```yaml
 type: sql
 query: >
-  select count(*) from output
+  select count(*) from outputs
   where level = 'error';
 expect: result == 0
 ```
 
 ## Primitive Types
 
-A signal is represented as a [discriminated union](docs/spec#discriminated-unions) of primitive types (although there is currently only one such type):
+A signal is represented as a [discriminated union](/docs/spec#discriminated-unions) of primitive types (although there is currently only one such type):
 
 - [sql](/docs/spec/signal/sql) - calculates the signal with a SQLite query

@@ -109,7 +109,7 @@ For schemaless DBs, infer writes from the source code and write effects.
 
 ## Signals
 
-You should write as [signal](/docs/spec/signal) for every behavorial pattern you expect to observe.
+You should write a [signal](/docs/spec/signal) for every behavorial pattern you expect to observe.
 
 For example, this signal states that any attempt to create a user with an age less than 18
 should result in an API error. It might live at `.rngo/signals/minor-users-rejected.yml`:
@@ -118,11 +118,11 @@ should result in an API error. It might live at `.rngo/signals/minor-users-rejec
 type: sql
 query: >
   SELECT count(*) 
-  FROM signals s
-    JOIN effects e ON s.effect_id = e.id
-  WHERE e.key = 'user.post'
-  AND e.value ->> '$.age' < 18
-  AND s.data NOT LIKE '%422 Unprocessable Content%';
+  FROM outputs o
+    JOIN inputs i ON o.input_id = i.id
+  WHERE i.effect = 'user.post'
+  AND i.data ->> '$.body.age' < 18
+  AND o.data NOT LIKE '%422 Unprocessable Content%';
 expect: result == 0
 ```
 
@@ -132,14 +132,14 @@ although in many cases the signals themselves will be the source of truth.
 ## Generators
 
 You should avoid duplicating a [generator](/docs/spec/generator) across multiple effects. Instead, add a
-[custom generator type](/docs/spec/generator#custom-generator-types) and reference it by name.
+[custom generator type](/docs/spec/generator#custom-types) and reference it by name.
 
 For example, if you add the following at `.rngo/generators/uuid.yml`:
 
 ```yaml
 generator:
   type: string
-  pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+  pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 ```
 
 You can reference it at, e.g., `.rngo/effects/user.create.yml`:
@@ -154,4 +154,5 @@ generator:
       type: uuid
     name:
       type: string
+      pattern: "[A-Za-z ]{5,20}"
 ```

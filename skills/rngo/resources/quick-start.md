@@ -9,9 +9,14 @@ brew install rngodev/tap/cli
 Make a file called `rngo.yml` with this configuration:
 
 ```yaml
+version: 1
 seed: 1
+channels:
+  out:
+    type: stdout
 effects:
   users.create:
+    channel: out
     generator:
       type: object
       properties:
@@ -49,6 +54,7 @@ effects:
                     type: constant
                     value: Chester
   posts.create:
+    channel: out
     generator:
       type: object
       properties:
@@ -84,19 +90,19 @@ effects:
 Now run the simulation like this:
 
 ```
-rngo eval --spec rngo.yml --stdout
+rngo eval --stdout rngo.yml
 ```
 
 This will output data that looks something like this:
 
 ```json
-{"key":"users.create","offset":683878,"value":{"id":1,"name":"Alice Agarwal"}}
-{"key":"users.create","offset":729698,"value":{"id":2,"name":"Bob Bates"}}
-{"key":"posts.create","offset":1036600,"value":{"id":1,"title":"Lorem Ipsum","authorId":1}}
+{"id":1,"name":"Alice Agarwal"}
+{"id":2,"name":"Bob Bates"}
+{"authorId":1,"id":1,"title":"Lorem Ipsum"}
 ```
 
 ---
 
 ## Next Step
 
-Learn how to [initialize a project for rngo](/docs/guides/initialize).
+Learn how to [initialize a project for rngo](/docs/guides/initialize-your-project).

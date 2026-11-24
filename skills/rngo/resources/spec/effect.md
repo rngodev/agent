@@ -1,6 +1,6 @@
 # Effect
 
-An **effect** generates inputs to a [channel](/docs/channel). For example, the following effect generates user creation input roughly once per hour:
+An **effect** generates inputs to a [channel](/docs/spec/channel). For example, the following effect generates user creation input roughly once per hour:
 
 ```yaml
 trigger: hz(1, hour)
@@ -27,6 +27,7 @@ A [prototype](/docs/spec/prototype) provides default values for the following pa
 
 - `start`
 - `end`
+- `limit`
 - `channel`
 
 If not specified, the [default prototype](/docs/spec/prototype#default) will be used.
@@ -51,7 +52,7 @@ hz(3, hour) + (0.0001 * offset)
 
 The expression is sampled periodically over the course of the simulation, so the observed frequency will change in steps.
 
-Trigger frequency will always be adjusted to be greater than or equal to zero and less than 1000 Hz.
+If the frequency reaches zero, the effect ends. If the expression returns a negative or non-numeric value, the eval fails with an error.
 
 ### `start` — optional
 
@@ -65,9 +66,15 @@ When the effect ends. Defaults to the [prototype's](/docs/spec/prototype) `end`.
 
 May be expressed as either an [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) string, or a [time expression](/docs/reference/expressions#time).
 
+### `limit` — optional
+
+The maximum number of inputs the effect emits. Must be a positive integer. Defaults to the [prototype's](/docs/spec/prototype) `limit`.
+
+If both `end` and `limit` are set, the effect ends at whichever comes first.
+
 ### `channel` — optional
 
-All effects are bound to a **channel**:
+The key of the **channel** that receives the effect's inputs:
 
 ```yaml
 channels:
@@ -86,7 +93,7 @@ effects:
 
 Defaults to the [prototype's](/docs/spec/prototype) `channel`.
 
-If a channel cannot be resolved, the effect's inputs will not be sent to the [proxy](/docs/concepts#proxy), but they will still be captured in the [log](/docs/concepts#log).
+If neither sets a channel, the effect's inputs are not sent anywhere, but they will still be captured in the [log](/docs/concepts#log).
 
 ### `metadata` — optional
 
@@ -101,7 +108,7 @@ effects:
     generator: ...
 ```
 
-In this case, the effect's metadata is meaningful to it's "mysql" channel. Assuming the channel uses the
+In this case, the effect's metadata is meaningful to its "mysql" channel. Assuming the channel uses the
 "sql" format, it will use the `table` metadata field as the table name when formatting SQL statements.
 
 ### `generator` — required
@@ -145,7 +152,7 @@ generator:
 
 ### API Calls
 
-Route realtime effects - i.e. happnening after "now" - to public channels, in this case the "api" channel.
+Route realtime effects - i.e. happening after "now" - to public channels, in this case the "api" channel.
 
 ```yaml
 trigger: "hz(15, minute)"
@@ -170,7 +177,7 @@ generator:
           variables:
             author:
               type: reference
-              effect: user.create
+              effect: users.create
         title:
           type: string
           pattern: .{20,100}

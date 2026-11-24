@@ -61,7 +61,7 @@ generators:
   uuid:
     generator:
       type: string
-      pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+      pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 effects:
   users.create:
     generator:
@@ -71,6 +71,7 @@ effects:
           type: uuid
         name:
           type: string
+          pattern: "[A-Za-z ]{5,20}"
   posts.create:
     generator:
       type: object
@@ -92,16 +93,17 @@ effects:
       properties:
         id:
           type: string
-          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
         name:
           type: string
+          pattern: "[A-Za-z ]{5,20}"
   posts.create:
     generator:
       type: object
       properties:
         id:
           type: string
-          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
         authorId:
           type: reference
           effect: users.create

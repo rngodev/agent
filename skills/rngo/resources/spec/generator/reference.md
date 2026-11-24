@@ -1,6 +1,6 @@
 # reference
 
-Samples values from the run log for the specified [effect](/docs/spec/effect).
+Samples values from the log for the specified [effect](/docs/spec/effect).
 
 ## Parameters
 

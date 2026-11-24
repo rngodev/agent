@@ -11,6 +11,7 @@ The rngo specification language is declarative and intuitive - both you and your
 will find it easy to write. Here's an example spec:
 
 ```yaml
+version: 1
 key: my-blog
 seed: 1
 start: now - years(2)
@@ -48,7 +49,7 @@ effects:
           pattern: .{2,64}
         email:
           type: function
-          expression: "'user' + number + '@example.com'"
+          expression: "'user' + string(number) + '@example.com'"
           variables:
             number:
               type: number
@@ -80,25 +81,25 @@ effects:
                   effect: users.create
             title:
               type: string
-              format: .{0,100}
+              pattern: "[A-Za-z ]{0,100}"
 signals:
   api-minimum-title-length:
     type: sql
     query: >
       SELECT count(*) 
-      FROM signals s
-        JOIN effects e ON s.effect_id = e.id
-      WHERE e.key = 'articles.post'
-      AND length(e.value ->> '$.title') < 10
-      AND s.data NOT LIKE '%422 Unprocessable Content%';
+      FROM outputs o
+        JOIN inputs i ON o.input_id = i.id
+      WHERE i.effect = 'articles.post'
+      AND length(i.data ->> '$.body.title') < 10
+      AND o.data NOT LIKE '%422 Unprocessable Content%';
     expect: result == 0
 ```
 
 You can use the [rngo eval](/docs/cli/eval) CLI command to verify that the spec holds for a running instance of `my-blog`, e.g.:
 
 ```bash
-export API_BASE_URL=https://localhost:5000
-rngo eval --spec spec.yml
+export API_BASE_URL=http://localhost:5000
+rngo eval spec.yml
 ```
 
 This will produce output similar to:
@@ -106,8 +107,8 @@ This will produce output similar to:
 ```bash
 Simulation
 time: 2026-08-13 13:14:12
-db: 73104 effects, 0 signals
-api: 11 effects, 11 signals
+db: 73104 inputs, 0 outputs
+api: 11 inputs, 11 outputs
 
 Audit
 api-minimum-title-length: 0 (passed)

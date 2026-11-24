@@ -1,6 +1,6 @@
 # `rngo skills install`
 
-Installs the latest version of rngo's agent skills.
+Installs the version of rngo's agent skills that is compatible with the CLI.
 
 By default, this command will ask where to install the skills:
 
@@ -13,7 +13,7 @@ By default, this command will ask where to install the skills:
   Other
 ```
 
-If the skills at the selected directory are out-of-date, the CLI will remove them and replace them with latest release from [https://github.com/rngodev/agent](https://github.com/rngodev/agent).
+If the skills at the selected directory are out-of-date, the CLI will remove them and replace them with the newest release compatible with the CLI's version from [https://github.com/rngodev/agent](https://github.com/rngodev/agent).
 
 ## Flags
 
@@ -22,5 +22,5 @@ If the skills at the selected directory are out-of-date, the CLI will remove the
 You can directly specify the location using the `--path` flag:
 
 ```bash
-rngo skills intall --path ~/.myagent/skills
+rngo skills install --path ~/.myagent/skills
 ```

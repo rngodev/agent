@@ -10,6 +10,7 @@ There are two ways of representing a spec:
 This reference will focus on the JSON / YAML representation. Here's an example:
 
 ```yaml
+version: 1
 key: my-service
 seed: 41
 start: now - years(5)
@@ -40,7 +41,7 @@ signals:
   no-errors:
     type: sql
     query: >
-      select count(*) from metadata
+      select count(*) from outputs
       where level = 'error';
     expect: result == 0
 ```
@@ -51,12 +52,12 @@ The [`rngo eval`](/docs/cli/eval) CLI command evaluates whether a spec hold for 
 
 ## Discriminated Unions
 
-Several component types within a spec are represented as [discriminated unions](https://en.wikipedia.org/wiki/Tagged_union). This means that the component takes a `type` parameter, whose value is an enum that determines the schema of the other parameters..
+Several component types within a spec are represented as [discriminated unions](https://en.wikipedia.org/wiki/Tagged_union). This means that the component takes a `type` parameter, whose value is an enum that determines the schema of the other parameters.
 
 The spec component types that are represented as discriminated unions are:
 
 - [generator](/docs/spec/generator)
-- [format](/docs/spec)
+- [format](/docs/spec/format)
 - [channel](/docs/spec/channel)
 - [signal](/docs/spec/signal)
 
@@ -64,7 +65,13 @@ You can see in the example above that each of these component types have a `type
 
 ## Parameters
 
-### `key` — required
+### `version` — optional
+
+The spec format version. Currently the only version is `1`, which is also the default.
+
+`rngo` reports an error when a spec declares a format version that it doesn't support.
+
+### `key` — optional
 
 A unique, meaningful identifier for the spec.
 
@@ -122,4 +129,4 @@ Must be an object of named signals. See the [signal reference](/docs/spec/signal
 
 Custom generator types that may be used within an effect.
 
-Must be an object of named custom generator type. See the [custom generator types reference](/docs/spec/generator#custom-generator-types) for how to define one.
+Must be an object of named custom generator type. See the [custom generator types reference](/docs/spec/generator#custom-types) for how to define one.
