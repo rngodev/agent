@@ -27,7 +27,7 @@ Everything else in `resources/` is reference material to open as needed; don't r
   `context`, `function`, `number`, `object`, `reference`, `select`, `string`). Open the relevant one
   whenever you're unsure what a field is called or does — don't guess.
 - `resources/cli/*.md` — the `rngo` CLI `itself.
-- `resources/reference/*.md` — the run log and expression syntax.
+- `resources/reference/*.md` — the log and expression syntax.
 
 Trust `resources/` in this skill over anything else, including your own training data.
 
@@ -35,15 +35,20 @@ Trust `resources/` in this skill over anything else, including your own training
 
 ```
 .rngo/
-├── spec.yml              # key, seed, start, end
+├── spec.yml              # version, key, seed, start, end, prototypes
 ├── channels/*.yml        # one file per channel
 ├── effects/*.yml         # one file per effect
 ├── signals/*.yml         # one file per signal
 └── generators/*.yml      # named custom generator types, shared across effects
 ```
 
-If `.rngo/` doesn't exist yet, run `rngo init --default` to scaffold `spec.yml` and gitignore `.rngo/runs`
+If `.rngo/` doesn't exist yet, run `rngo init --default` to scaffold `spec.yml` and gitignore `.rngo/evals`
 and set up the defaults.
+
+`version` in `spec.yml` is the spec format version, currently `1`. Keep the one already there. A spec using
+`phases`, `schemas` or a channel `target` predates versioning: rename `schemas` to `generators`, replace
+`phases` with `prototypes`, and move the fields under `target` up onto the channel. Unknown fields on effects,
+triggers, scenarios and custom generators are errors, so don't invent fields.
 
 ## Step 1: Find every system-under-test
 
@@ -69,10 +74,10 @@ command. A wrong hostname or port makes the whole channel useless.
 
 One channel per interface found above, at `.rngo/channels/{name}.yml`. Two decisions per channel:
 
-- **`target.type`** — `stream` for something you pipe a long-lived connection into (a DB client, `tail -f`
+- **`type`** — `stream` for something you pipe a long-lived connection into (a DB client, `tail -f`
   a log file); `exec` for a one-shot command per effect (a `curl` template hitting an API).
-- **`format.type`** — `sql` if the target accepts SQL insert statements (most relational DBs); `json`
-  (or omit — `json` is the default no-op) for anything else, including document stores and APIs.
+- **`format.type`** — `sql` if the interface accepts SQL insert statements (most relational DBs);
+  `template` to build any other text, such as a `curl` command. Omit `format` to send the input's data as JSON.
 
 Read `resources/spec/channel.md` for the full field reference and worked examples (Postgres, cURL,
 log tailing) before writing one from scratch.
@@ -82,7 +87,7 @@ log tailing) before writing one from scratch.
 One effect per meaningful write path — usually one per table/collection, plus one per API mutation worth
 simulating in real time. Read the actual schema/migration/model file you located in Step 1; don't infer
 column shapes from memory or convention. For each field, translate its real type and constraints — there
-are only 9 schema primitives, so everything else is composed:
+are only 9 generator primitives, so everything else is composed:
 
 | What the field is | How to express it |
 |---|---|
@@ -91,7 +96,7 @@ are only 9 schema primitives, so everything else is composed:
 | integer / decimal, with bounds | `number`, using `minimum`/`maximum`/`scale`/`step` as appropriate |
 | boolean | `select` between `{type: constant, value: true}` and `{type: constant, value: false}` — weight it if the real-world split is skewed |
 | enum | `select` of `constant` options, one per allowed value |
-| nullable / optional field | `select` between the real schema and `{type: constant, value: null}` |
+| nullable / optional field | `select` between the real generator and `{type: constant, value: null}` |
 | foreign key / relation | `reference` to the referenced effect, usually wrapped in `function` to pull a specific field (e.g. `.id`) |
 | timestamp defaulting to "now" | `context` with `path: ["clock", "now"]` |
 | composed value (email, full name, money) | `function` combining `select`/`constant`/`string`/`number` variables — see `resources/spec/generator/function.md`'s email example |
@@ -122,13 +127,17 @@ spec's top-level `start`/`end` as the default prototype.
 
 ## Step 4: Factor out repeated shapes
 
-`resources/spec/generator.md#custom-types` describes defining a shape once under
-`.rngo/schemas/{name}.yml` (or inline under a top-level `schemas:` key) and referencing it by name to
-avoid repeating it across effects. As of the currently installed CLI, referencing a custom type this way
-fails with `no schema parser matched` — confirmed directly, not just in docs. Until that's fixed, when the
-same shape (an id pattern, a timestamp, a money amount, an email) shows up across multiple effects, inline
-it in each effect rather than factoring it out. If you hit that error yourself, that's this — it's not
-something wrong with what you wrote.
+When the same shape (an id pattern, a money amount, an email) shows up across multiple effects, define it
+once as a custom generator type in `.rngo/generators/{name}.yml` (or inline under the top-level
+`generators:` key) and use `type: {name}` in the effects. The file holds a single `generator` field:
+
+```yaml
+generator:
+  type: string
+  pattern: "[a-z]{5,10}"
+```
+
+See `resources/spec/generator.md#custom-types`.
 
 ## Step 5: Signals (only when asked, or clearly implied)
 

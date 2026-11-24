@@ -2,7 +2,7 @@ trigger: hz(5, hour)
 channel: db
 metadata:
   table: customers
-schema:
+generator:
   type: object
   properties:
     id:
@@ -15,15 +15,15 @@ schema:
         given:
           type: select
           options:
-            - schema: { type: constant, value: Alice }
-            - schema: { type: constant, value: Bob }
-            - schema: { type: constant, value: Priya }
+            - generator: { type: constant, value: Alice }
+            - generator: { type: constant, value: Bob }
+            - generator: { type: constant, value: Priya }
         family:
           type: select
           options:
-            - schema: { type: constant, value: Smith }
-            - schema: { type: constant, value: Chen }
-            - schema: { type: constant, value: Patel }
+            - generator: { type: constant, value: Smith }
+            - generator: { type: constant, value: Chen }
+            - generator: { type: constant, value: Patel }
     email:
       type: function
       expression: local + '@example.com'

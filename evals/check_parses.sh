@@ -10,10 +10,8 @@ if [ ! -d "$DIR/.rngo" ]; then
   exit 1
 fi
 
-OUT=$(cd "$DIR/.." && rngo run --dry-run --dir "$(basename "$DIR")" 2>&1)
-
-if echo "$OUT" | grep -qi "^error:"; then
-  echo "FAIL: $(echo "$OUT" | grep -i '^error:' | head -1)"
+if ! OUT=$(rngo eval --dry-run "$DIR" 2>&1); then
+  echo "FAIL: $OUT"
   exit 1
 fi
 

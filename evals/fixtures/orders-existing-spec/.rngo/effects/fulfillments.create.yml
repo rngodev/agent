@@ -2,7 +2,7 @@ trigger: hz(10, hour)
 channel: db
 metadata:
   table: fulfillments
-schema:
+generator:
   type: object
   properties:
     id:
